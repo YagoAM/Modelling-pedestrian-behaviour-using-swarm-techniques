@@ -1,4 +1,3 @@
-
 class Vector2D {
   float x;
   float y;
@@ -29,8 +28,8 @@ class Vector2D {
   }
   
   void setRandomPosition (){
-    this.x = random(0, 1)*600;
-    this.y = random(0, 1)*600;
+    this.x = random(width);
+    this.y = random(height);
   }
   
   void setRandom_with_maxMod (float maxMod){
@@ -134,4 +133,26 @@ float angle_between(Vector2D vect1, Vector2D vect2){
   float result = acos(num/den);
   result = degrees(result);
   return result;
+}
+
+
+
+
+Vector2D randomPosition(){
+  Vector2D vect = new Vector2D(random(width), random(height));
+  return vect;
+  }
+  
+Vector2D random_with_maxMod(float maxMod){
+  Vector2D vect = new Vector2D(random(-1, 1)*maxMod,random(-1, 1)*maxMod);
+  return vect;
+}
+
+Vector2D random_with_mod(float mod){
+  float x = random(-1, 1);
+  float y = random(-1, 1);
+  Vector2D aux = new Vector2D(x,y);
+  Vector2D vect = new Vector2D(aux.getUnitVector());
+  vect.multiply_by(mod);
+  return vect;
 }

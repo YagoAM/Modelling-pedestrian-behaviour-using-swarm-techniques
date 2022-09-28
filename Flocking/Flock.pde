@@ -5,22 +5,20 @@ class Flock{
     boids = new ArrayList <Boid>();
     
     for(int i=0; i<total; i++){
-      Boid boid = new Boid();
-      boid.pos.setRandomPosition();
-      boid.vel.setRandom_with_maxMod(2);
+      Boid boid = new Boid(randomPosition(),random_with_maxMod(2));
       boids.add(boid);
     }
   }
   
-  void update(){
+  void mueve(){
     for(Boid boid : boids){
-      boid.update();
+      boid.mueve();
     }
   }
   
-  void draw(){
+  void dibuja(){
     for(Boid boid : boids){
-      boid.draw();
+      boid.dibuja();
     }
   }
 }

@@ -1,6 +1,7 @@
 class Boid{
   int size = 15;
-  int previousFrame;
+  int maxVel = 5;
+  int maxAcc = 1;
   Vector2D pos;
   Vector2D vel;
   Vector2D acc;
@@ -8,9 +9,16 @@ class Boid{
   Vector2D newPos;
   Vector2D newVel;
   
-  Boid(){
-    previousFrame = frameCount;
+  Boid(){   
+    pos = new Vector2D();
+    vel = new Vector2D();
+    acc = new Vector2D();
     
+    newPos = new Vector2D();
+    newVel = new Vector2D();
+  }
+  
+  Boid(Vector2D posIn, Vector2D velIn){   
     pos = new Vector2D();
     vel = new Vector2D();
     acc = new Vector2D();
@@ -18,21 +26,25 @@ class Boid{
     newPos = new Vector2D();
     newVel = new Vector2D();
     
-    //pos.setRandomPosition();              //temporal
-    //vel.setRandom_with_mod(1);            //temporal
-    //acc.setRandom_with_maxMod(0.01);      //temporal
+    pos.set(posIn);
+    vel.set(velIn);
+    newPos.set(pos);
+    newVel.set(vel);
   }
   
-  void update(){
-    newVel.x = vel.x + (acc.x * (frameCount - previousFrame));
-    newVel.y = vel.y + (acc.y * (frameCount - previousFrame));
+  void mueve(){
     
-    newPos.x = pos.x + (vel.x * (frameCount - previousFrame));
-    newPos.y = pos.y + (vel.y * (frameCount - previousFrame));
-    previousFrame = frameCount;
+    newVel.add(acc);
+    newVel.limit(maxVel);
+    newPos.add(newVel);
+    
   }
-  
+
   void dibuja(){
+    pos.set(newPos);
+    vel.set(newVel);
+    
+    pushMatrix();
     translate(pos.x, pos.y);
     rotate(vel.getAngle());
     fill(255);
@@ -41,13 +53,6 @@ class Boid{
     arc(0,0,size,size,1.0472,5.23599, OPEN);
     noFill();
     arc(0,0,size,size,0,PI*2, OPEN);
-    translate(-1*pos.x, -1*pos.y);
-    rotate(-1*vel.getAngle());
-  }
-  
-  void draw(){
-    pos.set(newPos);
-    vel.set(newVel);
-    this.dibuja();
+    popMatrix();
   }
 }
