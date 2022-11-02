@@ -104,10 +104,17 @@ class Vector2D {
     }
   }
   
-  void print_(){
-    print("[" + str(this.x) + "," + str(this.y) + "]");
+  void print(){
+    println("[" + str(this.x) + "," + str(this.y) + "]");
+  }
+  
+  void cero(){
+    x = 0;
+    y = 0;
   }
 }
+
+//FIN DECLARACION CLASE VECTOR2D
 
 Vector2D add (Vector2D vect1, Vector2D vect2){
   Vector2D sum = new Vector2D(vect1);
@@ -134,9 +141,6 @@ float angle_between(Vector2D vect1, Vector2D vect2){
   result = degrees(result);
   return result;
 }
-
-
-
 
 Vector2D randomPosition(){
   Vector2D vect = new Vector2D(random(width), random(height));
