@@ -33,7 +33,7 @@ class Interaccion implements interacciones {
       }
     }
     
-    boid.setSepar(acc); //<>//
+    boid.setSeparMuro(acc); //<>//
   }
 
   void colision(Flock flock, Grid grid) {

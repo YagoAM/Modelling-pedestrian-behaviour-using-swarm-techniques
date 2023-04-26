@@ -4,6 +4,7 @@ interface boids {
   void setVel(Vector2D in);
   void setDirec(Vector2D in);
   void setSepar(Vector2D in);
+  void setSeparMuro(Vector2D in);
   void setAlin(Vector2D in);
   void setCohes(Vector2D in);
 
@@ -23,6 +24,7 @@ class Boid implements boids {
   Vector2D acc;
   Vector2D direccion;  //Aceleración que marca la direccion en la que se tiene que mover para llegar al destino.
   Vector2D separacion;  //Aceleración de la componente de separación.
+  Vector2D separacionMuro;  //Aceleración de la componente de separación del muro.
   Vector2D alineamiento;  //Aceleración de la componente de alineamiento.
   Vector2D cohesion;  //Aceleración de la componente de cohesion.
   color fillColor;  //Color para la representacion del Boid, variará dependiendo de a que Flock pertenezca, para poder diferenciarlos.
@@ -34,6 +36,7 @@ class Boid implements boids {
   static final float radioVision = 90;
   static final float dirGain = 0.5;
   static final float separGain = 5;
+  static final float separMuroGain = 5;
   static final float alinGain = 0.1;
   static final float cohesGain = 1;
 
@@ -45,6 +48,7 @@ class Boid implements boids {
     
     direccion = new Vector2D();
     separacion = new Vector2D();
+    separacionMuro = new Vector2D();
     alineamiento = new Vector2D();
     cohesion = new Vector2D();
     
@@ -67,6 +71,10 @@ class Boid implements boids {
     in.multiply_by(separGain);
     separacion = in;
   }
+  void setSeparMuro(Vector2D in) {
+    in.multiply_by(separMuroGain);
+    separacionMuro = in;
+  }
   void setAlin(Vector2D in) {
     in.multiply_by(alinGain);
     alineamiento = in;
@@ -82,6 +90,7 @@ class Boid implements boids {
 
     
     acc.add(separacion); //<>//
+    acc.add(separacionMuro);
     acc.add(alineamiento); //<>//
     acc.add(cohesion); //<>//
 
