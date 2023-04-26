@@ -30,10 +30,10 @@ class Boid implements boids {
   /*Atributos Static*/
   static final float size = 13;
   static final float maxVel = 2;
-  static final float maxAcc = 0.6;
+  static final float maxAcc = 0.5;
   static final float radioVision = 90;
   static final float dirGain = 0.5;
-  static final float separGain = 1000;
+  static final float separGain = 5;
   static final float alinGain = 0.1;
   static final float cohesGain = 1;
 
@@ -78,17 +78,17 @@ class Boid implements boids {
 
   /*Funcion de calculo de la aceleracion final*/
   void calcAcc() {
-    acc.setCero();
+    acc.setCero(); //<>//
 
     
-    acc.add(separacion);
-    acc.add(alineamiento);
-    acc.add(cohesion);
+    acc.add(separacion); //<>//
+    acc.add(alineamiento); //<>//
+    acc.add(cohesion); //<>//
 
-    acc.limit(maxAcc);
+    acc.limit(maxAcc); //<>//
     
-    acc.add(direccion);
-    acc.limit(maxAcc);
+    acc.add(direccion); //<>//
+    acc.limit(maxAcc); //<>//
   }
 
   /*Funciones basicas*/

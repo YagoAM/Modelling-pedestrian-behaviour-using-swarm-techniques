@@ -67,7 +67,7 @@ float dotProduct(Vector2D vect1, Vector2D vect2) {
   return result;
 }
 
-Vector2D substract (Vector2D vect1, Vector2D vect2){
+Vector2D substract (Vector2D vect1, Vector2D vect2) {
   Vector2D sum = new Vector2D(vect1);
   sum.substract(vect2);
   return sum;
@@ -154,9 +154,7 @@ class Vector2D implements vector {
   Vector2D getUnitVector() {
     float mod = this.getModule();
     Vector2D unit = new Vector2D();
-    if (mod == 0){
-      unit.x = 1; //<>//
-      unit.y = 0;
+    if (mod == 0) {
       return unit;
     }
     unit.x = x/mod;
@@ -178,7 +176,8 @@ class Vector2D implements vector {
   }
 
   void limit(float lim) {
-    if (this.getModule() > lim) {
+    if (this.getModule() == 0) {
+    } else if (this.getModule() > lim) {
       this.setMod(lim);
     }
   }

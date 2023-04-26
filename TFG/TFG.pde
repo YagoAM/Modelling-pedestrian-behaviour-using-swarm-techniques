@@ -5,7 +5,7 @@ FlowField ff;
 
 void setup() {
   size(1500, 1000);  //ancho, alto
-  grid = new Grid(20); //Validos: 10, 20, 25, 50 y 100
+  grid = new Grid(50); //Validos: 10, 20, 25, 50 y 100
   input = new Input(grid);
   flocklist = new FlockList(grid);
 }

@@ -43,6 +43,6 @@ class FlockList implements flocklists {
       interactor.colision(flock, grid);
       interactor.flow(flock, grid);
     }
-    interactor.flocking(this); //<>//
+    interactor.flocking(this);
   }
 }

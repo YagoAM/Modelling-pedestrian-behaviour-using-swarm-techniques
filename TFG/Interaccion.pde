@@ -33,7 +33,7 @@ class Interaccion implements interacciones {
       }
     }
     
-    boid.setSepar(acc);
+    boid.setSepar(acc); //<>//
   }
 
   void colision(Flock flock, Grid grid) {
@@ -51,7 +51,7 @@ class Interaccion implements interacciones {
         flock.generarPathing();
       } else {
         Vector2D direc = new Vector2D(flock.flowfield.tiles.get(casillaBoid).direccion);
-        boid.setDirec(direc);
+        boid.setDirec(direc); //<>//
       }
     }
   }
@@ -89,26 +89,27 @@ class Interaccion implements interacciones {
 
   void separ_acc(Boid boid, ArrayList <Boid> near_boids) {
     Vector2D acc; //<>//
-    acc = new Vector2D();
-    Vector2D direction;
-    direction = new Vector2D();
-    float dist_factor = 30;
-    float distance;
+    acc = new Vector2D(); //<>//
+    Vector2D direction; //<>//
+    direction = new Vector2D(); //<>//
+    float dist_factor = 30; //<>//
+    float distance; //<>//
 
     if (near_boids.size()>0) { //<>//
-      for (int i=0; i<near_boids.size(); i++) {
-        distance = boid.dist2(near_boids.get(i));
-        direction = substract(boid.pos, near_boids.get(i).pos).getUnitVector();
-        if (distance > Boid.size) {
-          direction.multiply_by(dist_factor/(distance-Boid.size));
-        } else {
-          direction.multiply_by(10000);
-        }
-        acc.add(direction);
-      }
+      for (int i=0; i<near_boids.size(); i++) { //<>//
+        if(boid == near_boids.get(i)); //<>//
+        distance = boid.dist2(near_boids.get(i)); //<>//
+        direction = substract(boid.pos, near_boids.get(i).pos).getUnitVector(); //<>//
+        if (distance > Boid.size) { //<>//
+          direction.multiply_by(dist_factor/(distance-Boid.size)); //<>//
+        } else { //<>//
+          direction.multiply_by(10000); //<>//
+        } //<>//
+        acc.add(direction); //<>//
+      } //<>//
       acc.divide_by(near_boids.size());
     }
-
+ //<>//
     boid.setSepar(acc);
   }
 
@@ -117,7 +118,7 @@ class Interaccion implements interacciones {
     near_flock_boids = new ArrayList <Boid>();
     for (Flock flock : lista.lista) {
       for (Boid boid : flock.boids) {
-        for (Boid boid2 : flock.boids) { //<>//
+        for (Boid boid2 : flock.boids) {
           if (boid2 == boid) {
             continue;
           }
