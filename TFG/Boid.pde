@@ -20,6 +20,7 @@ interface boids {
 class Boid implements boids {
   /*Atributos*/
   Vector2D pos;
+  Vector2D prevPos;
   Vector2D vel;
   Vector2D acc;
   Vector2D direccion;  //Aceleración que marca la direccion en la que se tiene que mover para llegar al destino.
@@ -31,18 +32,19 @@ class Boid implements boids {
 
   /*Atributos Static*/
   static final float size = 13;
-  static final float maxVel = 2;
-  static final float maxAcc = 0.5;
-  static final float radioVision = 90;
-  static final float dirGain = 0.5;
-  static final float separGain = 5;
-  static final float separMuroGain = 5;
-  static final float alinGain = 0.1;
-  static final float cohesGain = 1;
+  static final float MAX_VEL = 2;
+  static final float MAX_ACC = 0.5;
+  static final float VISION_RADIO = 90;
+  static final float DIRECTION_GAIN = 0.5;
+  static final float SEPARATION_GAIN = 5;
+  static final float WALL_SEPARATION_GAIN = 100;
+  static final float ALIGNMENT_GAIN = 0.1;
+  static final float COHESION_GAIN = 1;
 
   /*Constructor*/
   Boid(Vector2D posIn, Vector2D velIn, color colorIn) {
     pos = new Vector2D(posIn);
+    prevPos = new Vector2D(posIn);
     vel = new Vector2D(velIn);
     acc = new Vector2D();
     
@@ -64,57 +66,58 @@ class Boid implements boids {
     vel = in;
   }
   void setDirec(Vector2D in) {
-    in.multiply_by(dirGain);
+    in.multiply_by(DIRECTION_GAIN);
     direccion = in;
   }
   void setSepar(Vector2D in) {
-    in.multiply_by(separGain);
+    in.multiply_by(SEPARATION_GAIN);
     separacion = in;
   }
   void setSeparMuro(Vector2D in) {
-    in.multiply_by(separMuroGain);
+    in.multiply_by(WALL_SEPARATION_GAIN);
     separacionMuro = in;
   }
   void setAlin(Vector2D in) {
-    in.multiply_by(alinGain);
+    in.multiply_by(ALIGNMENT_GAIN);
     alineamiento = in;
   }
   void setCohes(Vector2D in) {
-    in.multiply_by(cohesGain);
+    in.multiply_by(COHESION_GAIN);
     cohesion = in;
   }
 
   /*Funcion de calculo de la aceleracion final*/
   void calcAcc() {
-    acc.setCero(); //<>//
+    acc.setCero();
 
     
-    acc.add(separacion); //<>//
+    acc.add(separacion);
     acc.add(separacionMuro);
-    acc.add(alineamiento); //<>//
-    acc.add(cohesion); //<>//
+    acc.add(alineamiento);
+    acc.add(cohesion);
 
-    acc.limit(maxAcc); //<>//
+    acc.limit(MAX_ACC);
     
-    acc.add(direccion); //<>//
-    acc.limit(maxAcc); //<>//
+    acc.add(direccion);
+    acc.limit(MAX_ACC);
   }
 
   /*Funciones basicas*/
   void mueve() {
     calcAcc();
     vel.add(acc);
-    vel.limit(maxVel);
+    vel.limit(MAX_VEL);
+    prevPos.set(pos);
     pos.add(vel);
 
-    if (pos.x > width) {
+    if (pos.x >= width) {
       pos.x = width;
-    } else if (pos.x < 0) {
+    } else if (pos.x <= 0) {
       pos.x = 0;
     }
-    if (pos.y > height) {
+    if (pos.y >= height) {
       pos.y = height;
-    } else if (pos.y < 0) {
+    } else if (pos.y <= 0) {
       pos.y = 0;
     }
   }
@@ -135,7 +138,7 @@ class Boid implements boids {
   float dist2(Boid other) {
     Vector2D dist = new Vector2D();
     dist.set(pos);
-    dist.substract(other.pos);
+    dist.substract(other.pos); //<>//
     return(dist.getModule());
   }
 }

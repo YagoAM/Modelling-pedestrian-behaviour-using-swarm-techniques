@@ -14,6 +14,8 @@ interface vector {
   void substract(Vector2D in);
   void multiply_by(float gain);
   void divide_by(float div);
+  float getX();
+  float getY();
 
   /*Funciones polares*/
   float getModule();
@@ -28,6 +30,38 @@ interface vector {
 }
 
 /*Funciones externas a la clase*/
+Vector2D get_perpendicular(Vector2D in) {
+  return new Vector2D(in.y, -in.x);
+}
+
+Vector2D getNormalToLine(Vector2D p1, Vector2D p2) { //Te devuelve la normal hacia la izquierda desde el punto de vista del primer punto
+  float dx = p2.getX() - p1.getX();
+  float dy = p2.getY() - p1.getY();
+  float nx = -dy;
+  float ny = dx;
+  return new Vector2D(nx, ny);
+}
+
+Vector2D line_line_p(Vector2D v0, Vector2D v1, Vector2D v2, Vector2D v3) {
+  Vector2D intercept = null;
+
+  float f1 = (v1.x - v0.x);
+  float g1 = (v1.y - v0.y);
+  float f2 = (v3.x - v2.x);
+  float g2 = (v3.y - v2.y);
+  float f1g2 = f1 * g2;
+  float f2g1 = f2 * g1;
+  float det = f2g1 - f1g2;
+
+  if (abs(det) > 1E-30) {
+    float s = (f2*(v2.y - v0.y) - g2*(v2.x - v0.x))/ det;
+    float t = (f1*(v2.y - v0.y) - g1*(v2.x - v0.x))/ det;
+    if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
+      intercept = new Vector2D(v0.x + f1 * s, v0.y + g1 * s);
+  }
+  return intercept;
+}
+
 float angleBetween(Vector2D vect1, Vector2D vect2) {
   float num = dotProduct(vect1, vect2);
   float den = vect1.getModule() * vect2.getModule();
@@ -39,7 +73,7 @@ float angleBetween(Vector2D vect1, Vector2D vect2) {
 float dist2(Vector2D uno, Vector2D dos) {
   Vector2D dist = new Vector2D();
   dist.set(uno);
-  dist.substract(dos);
+  dist.substract(dos); //<>//
   return(dist.getModule());
 }
 
@@ -69,7 +103,7 @@ float dotProduct(Vector2D vect1, Vector2D vect2) {
 
 Vector2D substract (Vector2D vect1, Vector2D vect2) {
   Vector2D sum = new Vector2D(vect1);
-  sum.substract(vect2);
+  sum.substract(vect2); //<>//
   return sum;
 }
 
@@ -130,9 +164,9 @@ class Vector2D implements vector {
     x+=in.x;
     y+=in.y;
   }
-  void substract(Vector2D in) {
-    x-=in.x;
-    y-=in.y;
+  void substract(Vector2D in) { //<>//
+    x-=in.x; //<>//
+    y-=in.y; //<>//
   }
   void multiply_by(float gain) {
     x*=gain;
@@ -141,6 +175,12 @@ class Vector2D implements vector {
   void divide_by(float div) {
     x/=div;
     y/=div;
+  }
+  float getX() {
+    return x;
+  }
+  float getY() {
+    return y;
   }
 
   /*Funciones polares*/
