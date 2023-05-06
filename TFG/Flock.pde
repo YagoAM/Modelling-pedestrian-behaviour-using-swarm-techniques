@@ -47,7 +47,7 @@ class Flock {
     
     while (i < total) {
       posicion = new Vector2D(grid.get(casilla).centro);
-      posicion.add(randomWithMaxMod(grid.lado));
+      posicion.add(randomWithMaxMod(grid.lado/2));
       Boid boid = new Boid(posicion, new Vector2D(), flockColor);
       boids.add(boid);
       i++;

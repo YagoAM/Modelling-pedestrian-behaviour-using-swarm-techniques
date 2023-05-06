@@ -1,12 +1,13 @@
-interface boids {
+interface boids { //<>//
   /*Funciones Set*/
   void setPos(Vector2D in);
   void setVel(Vector2D in);
   void setDirec(Vector2D in);
-  void setSepar(Vector2D in);
+  //void setSepar(Vector2D in);
+  //void setAlin(Vector2D in);
+  //void setCohes(Vector2D in);
+  void setFlocking(Vector2D in);
   void setSeparMuro(Vector2D in);
-  void setAlin(Vector2D in);
-  void setCohes(Vector2D in);
 
   /*Funcion de calculo de la aceleracion final*/
   void calcAcc();
@@ -24,22 +25,24 @@ class Boid implements boids {
   Vector2D vel;
   Vector2D acc;
   Vector2D direccion;  //Aceleración que marca la direccion en la que se tiene que mover para llegar al destino.
-  Vector2D separacion;  //Aceleración de la componente de separación.
+  //Vector2D separacion;  //Aceleración de la componente de separación.
+  //Vector2D alineamiento;  //Aceleración de la componente de alineamiento.
+  //Vector2D cohesion;  //Aceleración de la componente de cohesion.
+  Vector2D flocking;
   Vector2D separacionMuro;  //Aceleración de la componente de separación del muro.
-  Vector2D alineamiento;  //Aceleración de la componente de alineamiento.
-  Vector2D cohesion;  //Aceleración de la componente de cohesion.
   color fillColor;  //Color para la representacion del Boid, variará dependiendo de a que Flock pertenezca, para poder diferenciarlos.
 
   /*Atributos Static*/
   static final float size = 13;
   static final float MAX_VEL = 2;
-  static final float MAX_ACC = 0.5;
-  static final float VISION_RADIO = 90;
+  static final float MAX_ACC = 0.3;
+  static final float VISION_RADIO = 60;
   static final float DIRECTION_GAIN = 0.5;
-  static final float SEPARATION_GAIN = 5;
-  static final float WALL_SEPARATION_GAIN = 100;
-  static final float ALIGNMENT_GAIN = 0.1;
-  static final float COHESION_GAIN = 1;
+  //static final float SEPARATION_GAIN = 5;
+  //static final float ALIGNMENT_GAIN = 0.1;
+  //static final float COHESION_GAIN = 1;
+  static final float FLOCKING_GAIN = 0.3;
+  static final float WALL_SEPARATION_GAIN = 10;
 
   /*Constructor*/
   Boid(Vector2D posIn, Vector2D velIn, color colorIn) {
@@ -47,57 +50,71 @@ class Boid implements boids {
     prevPos = new Vector2D(posIn);
     vel = new Vector2D(velIn);
     acc = new Vector2D();
-    
+
     direccion = new Vector2D();
-    separacion = new Vector2D();
+    //separacion = new Vector2D();
+    //alineamiento = new Vector2D();
+    //cohesion = new Vector2D();
+    flocking = new Vector2D();
     separacionMuro = new Vector2D();
-    alineamiento = new Vector2D();
-    cohesion = new Vector2D();
-    
+
     fillColor = colorIn;
   }
 
   /*Métodos*/
   /*Funciones Set*/
   void setPos(Vector2D in) {
-    pos = in;
+    Vector2D aux = new Vector2D(in);
+    pos = aux;
   }
   void setVel(Vector2D in) {
-    vel = in;
+    Vector2D aux = new Vector2D(in);
+    vel = aux;
   }
   void setDirec(Vector2D in) {
-    in.multiply_by(DIRECTION_GAIN);
-    direccion = in;
+    Vector2D aux = new Vector2D(in);
+    aux.multiply_by(DIRECTION_GAIN);
+    direccion = aux;
   }
-  void setSepar(Vector2D in) {
-    in.multiply_by(SEPARATION_GAIN);
-    separacion = in;
+  //void setSepar(Vector2D in) {
+  //  Vector2D aux = new Vector2D(in);
+  //  aux.multiply_by(SEPARATION_GAIN);
+  //  separacion = aux;
+  //}
+  //void setAlin(Vector2D in) {
+  //  Vector2D aux = new Vector2D(in);
+  //  aux.multiply_by(ALIGNMENT_GAIN);
+  //  alineamiento = aux;
+  //}
+  //void setCohes(Vector2D in) {
+  //  Vector2D aux = new Vector2D(in);
+  //  aux.multiply_by(COHESION_GAIN);
+  //  cohesion = aux;
+  //}
+  void setFlocking(Vector2D in) {
+    Vector2D aux = new Vector2D(in);
+    aux.multiply_by(FLOCKING_GAIN);
+    flocking = aux;
   }
   void setSeparMuro(Vector2D in) {
-    in.multiply_by(WALL_SEPARATION_GAIN);
-    separacionMuro = in;
-  }
-  void setAlin(Vector2D in) {
-    in.multiply_by(ALIGNMENT_GAIN);
-    alineamiento = in;
-  }
-  void setCohes(Vector2D in) {
-    in.multiply_by(COHESION_GAIN);
-    cohesion = in;
+    Vector2D aux = new Vector2D(in);
+    aux.multiply_by(WALL_SEPARATION_GAIN);
+    separacionMuro = aux;
   }
 
   /*Funcion de calculo de la aceleracion final*/
   void calcAcc() {
     acc.setCero();
 
-    
-    acc.add(separacion);
-    acc.add(separacionMuro);
-    acc.add(alineamiento);
-    acc.add(cohesion);
 
-    acc.limit(MAX_ACC);
-    
+    //acc.add(separacion);
+    //acc.add(alineamiento);
+    //acc.add(cohesion);
+    acc.add(flocking);
+    acc.add(separacionMuro);
+
+    //acc.limit(MAX_ACC);
+
     acc.add(direccion);
     acc.limit(MAX_ACC);
   }
@@ -138,7 +155,15 @@ class Boid implements boids {
   float dist2(Boid other) {
     Vector2D dist = new Vector2D();
     dist.set(pos);
-    dist.substract(other.pos); //<>//
+    dist.substract(other.pos);
     return(dist.getModule());
+  }
+
+  public boolean equals(Object obj) {
+    if (!(obj instanceof Boid)) {
+      return false;
+    }
+    Boid boid = (Boid)obj;
+    return this == boid;
   }
 }

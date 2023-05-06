@@ -1,4 +1,4 @@
-interface vector {
+interface vector { //<>// //<>// //<>// //<>// //<>//
   /*Funciones set*/
   void set(float in_x, float in_y);
   void set(Vector2D in);
@@ -21,6 +21,7 @@ interface vector {
   float getModule();
   float getAngle();
   Vector2D getUnitVector();
+  void setUnitVector();
   void setDirection(Vector2D in);  //Cambiar la direccion manteniendo el modulo
   void setMod(float mag);  //Cambiar el modulo manteniendo la direccion
   void limit(float lim);  //Cambiar el modulo a "lim" si es mayor que éste
@@ -30,6 +31,11 @@ interface vector {
 }
 
 /*Funciones externas a la clase*/
+float distSq(Vector2D uno, Vector2D dos) {
+  float dx = dos.x - uno.x;
+  float dy = dos.y - uno.y;
+  return dx*dx + dy*dy;
+}
 Vector2D get_perpendicular(Vector2D in) {
   return new Vector2D(in.y, -in.x);
 }
@@ -73,7 +79,7 @@ float angleBetween(Vector2D vect1, Vector2D vect2) {
 float dist2(Vector2D uno, Vector2D dos) {
   Vector2D dist = new Vector2D();
   dist.set(uno);
-  dist.substract(dos); //<>//
+  dist.substract(dos);
   return(dist.getModule());
 }
 
@@ -103,7 +109,7 @@ float dotProduct(Vector2D vect1, Vector2D vect2) {
 
 Vector2D substract (Vector2D vect1, Vector2D vect2) {
   Vector2D sum = new Vector2D(vect1);
-  sum.substract(vect2); //<>//
+  sum.substract(vect2);
   return sum;
 }
 
@@ -164,9 +170,9 @@ class Vector2D implements vector {
     x+=in.x;
     y+=in.y;
   }
-  void substract(Vector2D in) { //<>//
-    x-=in.x; //<>//
-    y-=in.y; //<>//
+  void substract(Vector2D in) {
+    x-=in.x;
+    y-=in.y;
   }
   void multiply_by(float gain) {
     x*=gain;
@@ -200,6 +206,11 @@ class Vector2D implements vector {
     unit.x = x/mod;
     unit.y = y/mod;
     return unit;
+  }
+  
+  void setUnitVector() {
+    Vector2D v = this.getUnitVector();
+    this.set(v);
   }
 
   void setDirection(Vector2D in) {

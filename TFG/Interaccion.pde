@@ -1,10 +1,14 @@
-interface interacciones { //<>// //<>//
+interface interacciones { //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>//
 }
 
 class Interaccion implements interacciones {
-  static final int PPAL_FEELER_LENGTH = 40;
-  static final int LATERAL_FEELER_LENGTH = 30;
+  static final int PPAL_FEELER_LENGTH = 25;
+  static final int LATERAL_FEELER_LENGTH = 11;
   static final float FEELER_ANGLE_FACTOR = 2.5;
+
+  static final float COHESION_GAIN = 1;
+  static final float SEPARATION_GAIN = 1.5;
+  static final float ALIGNMENT_GAIN = 0.1;
 
   void colision(Boid boid, Grid grid) {
     Casilla casillaBoid = new Casilla((int)(boid.pos.x/grid.lado), (int)(boid.pos.y/grid.lado));
@@ -55,18 +59,22 @@ class Interaccion implements interacciones {
     float distToThisWall = 0.0;
     float distToNearestWall = Float.MAX_VALUE;
     int closestWall = -1;
-    int closestLado = -1;
+    int trigeredFeeler = -1;
 
     Vector2D acc = new Vector2D();
     Vector2D closestPoint = new Vector2D();
     Vector2D auxPoint = new Vector2D();
 
-      for (int f=0; f<feelers.length; f++) {  //LOOP DE FEELERS
+    for (int f=0; f<feelers.length; f++) {  //LOOP DE FEELERS
       feeler = feelers[f];
       for (int i=0; i<8; i++) {  //LOOP DE MUROS
-        if (walls[i] == null){continue;}
-        wall = grid.get(walls[i]); //<>//
-        if (wall.pathable == true){continue;}
+        if (walls[i] == null) {
+          continue;
+        }
+        wall = grid.get(walls[i]);
+        if (wall.pathable == true) {
+          continue;
+        }
         for (int lado=0; lado<4; lado++) {  //LOOP LADOS DEL MURO
           switch(lado) {
           case 0:
@@ -81,32 +89,36 @@ class Interaccion implements interacciones {
           case 3:
             auxPoint = line_line_p(boid.pos, feeler, wall.down_left, wall.up_left);
             break;
-          } //<>//
+          }
           if (auxPoint!=null && (distToThisWall=dist2(boid.pos, auxPoint)) < distToNearestWall) {
             distToNearestWall = distToThisWall;
             closestWall = i;
-            closestLado = lado;
             closestPoint = new Vector2D(auxPoint);
+            trigeredFeeler = f;
           }
         }  //FIN LOOP LADOS DEL MURO
       }  //FIN LOOP DE MUROS
 
       if (closestWall>=0) {
         Vector2D profundidad = new Vector2D(feeler);
-        profundidad.substract(closestPoint); //<>//
+        profundidad.substract(closestPoint);
 
-        switch(closestLado) {
-        case 0:
-          acc = getNormalToLine(grid.get(walls[closestWall]).up_left, grid.get(walls[closestWall]).up_right);
+        switch(trigeredFeeler) {
+        case 0:  //FEELER DERECHA
+          acc = get_perpendicular(boid.vel.getUnitVector());
+          acc.multiply_by(1);
           break;
-        case 1:
-          acc = getNormalToLine(grid.get(walls[closestWall]).up_right, grid.get(walls[closestWall]).down_right);
+        case 1:  //FEELER IZQUIERDA
+          acc = get_perpendicular(boid.vel.getUnitVector());
+          acc.multiply_by(-1);
           break;
-        case 2:
-          acc = getNormalToLine(grid.get(walls[closestWall]).down_right, grid.get(walls[closestWall]).down_left);
+        case 2:  //FEELER DERECHA
+          acc = get_perpendicular(boid.vel.getUnitVector());
+          acc.multiply_by(1);
           break;
-        case 3:
-          acc = getNormalToLine(grid.get(walls[closestWall]).down_left, grid.get(walls[closestWall]).up_left);
+        case 3:  //FEELER IZQUIERDA
+          acc = get_perpendicular(boid.vel.getUnitVector());
+          acc.multiply_by(-1);
           break;
         }
         acc.getUnitVector();
@@ -114,53 +126,50 @@ class Interaccion implements interacciones {
         acc.multiply_by(-1);
       }
     }  //FIN LOOP DE FILLERS
-    
+
     boid.setSeparMuro(acc);
   }
 
 
 
   Vector2D[] setFeelers(Boid boid) {
-    Vector2D[] feelers = new Vector2D[3];
+    Vector2D[] feelers = new Vector2D[4];
     Vector2D auxFeeler = new Vector2D(boid.vel);
     auxFeeler.getUnitVector();
+    Vector2D aux=get_perpendicular(auxFeeler);
+
     feelers[0] = new Vector2D(auxFeeler);
-    feelers[0].multiply_by(PPAL_FEELER_LENGTH);
-    feelers[0].add(boid.pos);  //FEELER CENTRAL
-    
-    //line(boid.pos.x, boid.pos.y, feelers[0].x, feelers[0].y);
-    
-    feelers[1] = new Vector2D(auxFeeler);
-    Vector2D aux=get_perpendicular(feelers[1]);
     aux.divide_by(FEELER_ANGLE_FACTOR);//define el angulo de separacion, si es 1 son 45º, si es 2 son aprox 25º
-    feelers[1].add(aux);
+    feelers[0].add(aux);
+    feelers[0].getUnitVector();
+    feelers[0].multiply_by(PPAL_FEELER_LENGTH);
+    feelers[0].add(boid.pos); //FEELER DERECHA
+
+    feelers[1] = new Vector2D(auxFeeler);
+    feelers[1].substract(aux);
     feelers[1].getUnitVector();
-    feelers[1].multiply_by(LATERAL_FEELER_LENGTH);
-    feelers[1].add(boid.pos); //FEELER DERECHA (30 grados)
+    feelers[1].multiply_by(PPAL_FEELER_LENGTH);
+    feelers[1].add(boid.pos); //FEELER IZQUIERDA
     
-    //line(boid.pos.x, boid.pos.y, feelers[1].x, feelers[1].y);
-    
-    feelers[2] = new Vector2D(auxFeeler);
-    feelers[2].substract(aux); //<>//
+    aux=get_perpendicular(auxFeeler);
+
+    feelers[2] = new Vector2D();
+    feelers[2].add(aux);
     feelers[2].getUnitVector();
     feelers[2].multiply_by(LATERAL_FEELER_LENGTH);
-    feelers[2].add(boid.pos); //FEELER IZQUIERDA (30 grados)
-    
-    //line(boid.pos.x, boid.pos.y, feelers[2].x, feelers[2].y);
-    
-    /*
+    feelers[2].add(boid.pos); //FEELER DERECHA
+
     feelers[3] = new Vector2D();
-    feelers[3].add(aux);
+    feelers[3].substract(aux);
     feelers[3].getUnitVector();
-    feelers[3].multiply_by(LATERAL_FEELER_LENGTH);
-    feelers[3].add(boid.pos);
-    
-    feelers[4] = new Vector2D();
-    feelers[4].substract(aux);
-    feelers[4].getUnitVector();
-    feelers[4].multiply_by(LATERAL_FEELER_LENGTH);
-    feelers[4].add(boid.pos);
+    feelers[3].multiply_by(LATERAL_FEELER_LENGTH); //<>//
+    feelers[3].add(boid.pos); //FEELER IZQUIERDA
     /**/
+    
+    for (int i=0; i<feelers.length; i++){
+      line(boid.pos.x, boid.pos.y, feelers[i].x, feelers[i].y);
+    }
+    
     return feelers;
   }
 
@@ -184,86 +193,213 @@ class Interaccion implements interacciones {
     }
   }
 
-  void alig_acc(Boid boid, ArrayList <Boid> near_flock_boids) { //LA FORMULA ORIGINAL DE RAYNOLS ES EL SUMATORIO DE LAS VELOCIDADES DEL RESTO/NUMERO DE BOIDS CERCANOS - NUESTRA VELOCIDAD, PERO SE PUDEN CONSEGUIR RESULTADOS SIMILARES
-    //ENIENDO EN CUENTA NUESTRA VELOCIDAD AL CALCULAR LA VELOCIDAD MEDIA O NO RESTANDO NUESTRA VELOCIDAD. CUANDO ESTEN EL RESTO DE COMPORTAMIENTOS PROBARE LAS MODIFICACIONES SOBRE ESTE
+  //void alig_acc(Boid boid, ArrayList <Boid> near_flock_boids) { //LA FORMULA ORIGINAL DE RAYNOLS ES EL SUMATORIO DE LAS VELOCIDADES DEL RESTO/NUMERO DE BOIDS CERCANOS - NUESTRA VELOCIDAD, PERO SE PUDEN CONSEGUIR RESULTADOS SIMILARES
+  //  //ENIENDO EN CUENTA NUESTRA VELOCIDAD AL CALCULAR LA VELOCIDAD MEDIA O NO RESTANDO NUESTRA VELOCIDAD. CUANDO ESTEN EL RESTO DE COMPORTAMIENTOS PROBARE LAS MODIFICACIONES SOBRE ESTE
 
-    Vector2D vel_group;
-    vel_group = new Vector2D();
+  //  Vector2D vel_group;
+  //  vel_group = new Vector2D();
 
-    if (near_flock_boids.size()>0) {
-      //vel_group.add(this.vel.multiply_by(1)); //no hace nada pero es para poder jugar un poco y ver que hacer NO ENTIENDO QUE PASA
-      for (int i=0; i<near_flock_boids.size(); i++) {
-        vel_group.add(near_flock_boids.get(i).vel);
-      }
-      vel_group.divide_by(near_flock_boids.size());
-      vel_group.substract(boid.vel); //<>//
+  //  if (near_flock_boids.size()>0) {
+  //    //vel_group.add(this.vel.multiply_by(1)); //no hace nada pero es para poder jugar un poco y ver que hacer NO ENTIENDO QUE PASA
+  //    for (int i=0; i<near_flock_boids.size(); i++) {
+  //      vel_group.add(near_flock_boids.get(i).vel);
+  //    }
+  //    vel_group.divide_by(near_flock_boids.size());
+  //    vel_group.substract(boid.vel);
+  //  }
+  //  boid.setAlin(vel_group);
+  //}
+
+  //void cohes_acc(Boid boid, ArrayList <Boid> near_flock_boids) {
+  //  Vector2D acc;
+  //  acc = new Vector2D();
+
+  //  if (near_flock_boids.size()>0) {
+  //    for (int i=0; i<near_flock_boids.size(); i++) {
+  //      acc.add(near_flock_boids.get(i).pos);
+  //    }
+  //    acc.divide_by(near_flock_boids.size());
+  //    acc.substract(boid.pos);
+  //  }
+  //  boid.setCohes(acc);
+  //}
+
+  //void separ_acc(Boid boid, ArrayList <Boid> near_boids) {
+  //  Vector2D acc;
+  //  acc = new Vector2D();
+  //  Vector2D direction;
+  //  direction = new Vector2D();
+  //  float dist_factor = 30;
+  //  float distance;
+
+  //  if (near_boids.size()>0) {
+  //    for (int i=0; i<near_boids.size(); i++) {
+  //      if (boid == near_boids.get(i));
+  //      distance = boid.dist2(near_boids.get(i));
+  //      direction = substract(boid.pos, near_boids.get(i).pos).getUnitVector();
+  //      if (distance > Boid.size) {
+  //        direction.multiply_by(dist_factor/(distance-Boid.size));
+  //      } else {
+  //        direction.multiply_by(10000);
+  //      }
+  //      acc.add(direction);
+  //    }
+  //    acc.divide_by(near_boids.size());
+  //  }
+
+  //  boid.setSepar(acc);
+  //}
+
+  //void flocking(FlockList lista) {
+  //  ArrayList <Boid> near_flock_boids;
+  //  near_flock_boids = new ArrayList <Boid>();
+  //  for (Flock flock : lista.lista) {
+  //    for (Boid boid : flock.boids) {
+  //      for (Boid boid2 : flock.boids) {
+  //        if (boid2 == boid) {
+  //          continue;
+  //        }
+  //        float aux = dist2(boid.pos, boid2.pos);
+  //        if (aux<=Boid.VISION_RADIO) {
+  //          near_flock_boids.add(boid2);
+  //        }
+  //      }
+  //      alig_acc(boid, near_flock_boids);
+  //      cohes_acc(boid, near_flock_boids);
+  //      for (Boid boid2 : lista.listaBoid) {
+  //        if (dist2(boid.pos, boid2.pos)<=Boid.VISION_RADIO) {
+  //          near_flock_boids.add(boid2);
+  //        }
+  //      }
+  //      separ_acc(boid, near_flock_boids);
+  //    }
+  //  }
+  //}
+
+  void flocking (FlockList lista) {
+    Vector2D flockAcc = new Vector2D();
+    Vector2D sepAcc = new Vector2D();
+    Vector2D cohAcc = new Vector2D();
+    Vector2D alnAcc = new Vector2D();
+
+    //Vectores auxiliares
+    Vector2D avgHeading = new Vector2D();
+    Vector2D sepAux = new Vector2D();
+
+    //Variables auxiliares
+    float dist;
+    float neighbourCount;
+
+    ArrayList<Flock> flocks = lista.lista;
+
+    if (flocks == null || flocks.isEmpty()) {
+      return;
     }
-    boid.setAlin(vel_group);
-  }
 
-  void cohes_acc(Boid boid, ArrayList <Boid> near_flock_boids) {
-    Vector2D acc;
-    acc = new Vector2D();
-
-    if (near_flock_boids.size()>0) {
-      for (int i=0; i<near_flock_boids.size(); i++) {
-        acc.add(near_flock_boids.get(i).pos);
-      }
-      acc.divide_by(near_flock_boids.size());
-      acc.substract(boid.pos); //<>//
-    }
-    boid.setCohes(acc);
-  }
-
-  void separ_acc(Boid boid, ArrayList <Boid> near_boids) {
-    Vector2D acc;
-    acc = new Vector2D();
-    Vector2D direction;
-    direction = new Vector2D();
-    float dist_factor = 30;
-    float distance;
-
-    if (near_boids.size()>0) {
-      for (int i=0; i<near_boids.size(); i++) {
-        if (boid == near_boids.get(i));
-        distance = boid.dist2(near_boids.get(i));
-        direction = substract(boid.pos, near_boids.get(i).pos).getUnitVector();
-        if (distance > Boid.size) {
-          direction.multiply_by(dist_factor/(distance-Boid.size));
-        } else {
-          direction.multiply_by(10000);
-        }
-        acc.add(direction);
-      }
-      acc.divide_by(near_boids.size());
-    }
-
-    boid.setSepar(acc);
-  }
-
-  void flocking(FlockList lista) {
-    ArrayList <Boid> near_flock_boids;
-    near_flock_boids = new ArrayList <Boid>();
-    for (Flock flock : lista.lista) {
+    for (Flock flock : flocks) {
       for (Boid boid : flock.boids) {
-        for (Boid boid2 : flock.boids) {
-          if (boid2 == boid) {
-            continue;
+        flockAcc.setCero();
+        sepAcc.setCero();
+        cohAcc.setCero();
+        alnAcc.setCero();
+        avgHeading.setCero();
+        sepAux.setCero();
+        neighbourCount = 0;
+
+        ArrayList<Boid> flockNeighbours = getFlockNeighbours(boid, flock);
+        for (Boid other : flockNeighbours) {
+          dist = boid.dist2(other);
+          neighbourCount++;
+          //Cohesion
+          cohAcc.add(other.pos);
+          //Alignment
+          avgHeading.add(other.vel.getUnitVector());
+          //Separation
+          sepAux.set(substract(boid.pos, other.pos).getUnitVector());
+          if (dist > Boid.size) {
+            sepAux.divide_by(dist-Boid.size);
+          } else {
+            sepAux.multiply_by(10000);
           }
-          float aux = dist2(boid.pos, boid2.pos);
-          if (aux<=Boid.VISION_RADIO) {
-            near_flock_boids.add(boid2);
-          }
+          sepAcc.add(sepAux);
         }
-        alig_acc(boid, near_flock_boids);
-        cohes_acc(boid, near_flock_boids);
-        for (Boid boid2 : lista.listaBoid) {
-          if (dist2(boid.pos, boid2.pos)<=Boid.VISION_RADIO) {
-            near_flock_boids.add(boid2);
-          }
+        if (neighbourCount > 0) {
+          // Cohesion
+          cohAcc.divide_by(neighbourCount);
+          cohAcc.substract(boid.pos);
+          cohAcc.setUnitVector();
+          cohAcc.multiply_by(Boid.MAX_VEL);
+          cohAcc.substract(boid.vel);
+          cohAcc.setUnitVector();
+          cohAcc.multiply_by(COHESION_GAIN);
+
+          // Separation
+          sepAcc.setUnitVector();
+          sepAcc.multiply_by(SEPARATION_GAIN);
+
+          // Alignment
+          avgHeading.divide_by(neighbourCount);
+          avgHeading.substract(boid.vel.getUnitVector());
+          alnAcc.set(avgHeading);
+          alnAcc.multiply_by(ALIGNMENT_GAIN);
+
+          // Add them up
+          flockAcc.set(cohAcc);
+          flockAcc.add(sepAcc);
+          flockAcc.add(alnAcc);
         }
-        separ_acc(boid, near_flock_boids);
+        boid.setFlocking(flockAcc);
       }
     }
+  }
+
+  ArrayList<Boid> getFlockNeighbours(Boid boid, Flock flock) {
+    ArrayList<Boid> neighbours = new ArrayList<Boid>();
+
+    for (Boid other : flock.boids) {
+      if (other == boid) {
+        continue;
+      }
+      if (boid.dist2(other) <= Boid.VISION_RADIO) {
+        neighbours.add(other);
+      }
+    }
+
+    return neighbours;
+  }
+
+  ArrayList<Boid> getNonFlockNeighbours(Boid boid, Flock flock, FlockList flockList) {
+    ArrayList<Boid> neighbours = new ArrayList<Boid>();
+
+    for (Flock otherFlock : flockList.lista) {
+      if (otherFlock.boids.contains(boid)) {
+        continue;
+      }
+      for (Boid other : flock.boids) {
+        if (other == boid) {
+          continue;
+        }
+        if (boid.dist2(other) <= Boid.VISION_RADIO) {
+          neighbours.add(other);
+        }
+      }
+    }
+
+    return neighbours;
+  }
+
+  ArrayList<Boid> getAllNeighbours(Boid boid, FlockList flockList) {
+    ArrayList<Boid> neighbours = new ArrayList<Boid>();
+
+    for (Boid other : flockList.listaBoid) {
+      if (other == boid) {
+        continue;
+      }
+      if (boid.dist2(other) <= Boid.VISION_RADIO) {
+        neighbours.add(other);
+      }
+    }
+
+    return neighbours;
   }
 }
