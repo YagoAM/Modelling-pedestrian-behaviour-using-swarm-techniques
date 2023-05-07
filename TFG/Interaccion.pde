@@ -1,14 +1,15 @@
-interface interacciones { //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>//
+interface interacciones { //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>//
 }
 
 class Interaccion implements interacciones {
   static final int PPAL_FEELER_LENGTH = 25;
   static final int LATERAL_FEELER_LENGTH = 11;
   static final float FEELER_ANGLE_FACTOR = 2.5;
+  static final boolean SHOW_FEELERS = false;
 
-  static final float COHESION_GAIN = 1;
-  static final float SEPARATION_GAIN = 1.5;
-  static final float ALIGNMENT_GAIN = 0.1;
+  static final float COHESION_GAIN = 0.2;
+  static final float SEPARATION_GAIN = 9.5;
+  static final float ALIGNMENT_GAIN = 0.5;
 
   void colision(Boid boid, Grid grid) {
     Casilla casillaBoid = new Casilla((int)(boid.pos.x/grid.lado), (int)(boid.pos.y/grid.lado));
@@ -150,7 +151,7 @@ class Interaccion implements interacciones {
     feelers[1].getUnitVector();
     feelers[1].multiply_by(PPAL_FEELER_LENGTH);
     feelers[1].add(boid.pos); //FEELER IZQUIERDA
-    
+
     aux=get_perpendicular(auxFeeler);
 
     feelers[2] = new Vector2D();
@@ -162,14 +163,16 @@ class Interaccion implements interacciones {
     feelers[3] = new Vector2D();
     feelers[3].substract(aux);
     feelers[3].getUnitVector();
-    feelers[3].multiply_by(LATERAL_FEELER_LENGTH); //<>//
+    feelers[3].multiply_by(LATERAL_FEELER_LENGTH);
     feelers[3].add(boid.pos); //FEELER IZQUIERDA
     /**/
-    
-    for (int i=0; i<feelers.length; i++){
-      line(boid.pos.x, boid.pos.y, feelers[i].x, feelers[i].y);
+
+    if (SHOW_FEELERS) {
+      for (int i=0; i<feelers.length; i++) {
+        line(boid.pos.x, boid.pos.y, feelers[i].x, feelers[i].y);
+      }
     }
-    
+
     return feelers;
   }
 
@@ -188,6 +191,11 @@ class Interaccion implements interacciones {
         flock.generarPathing();
       } else {
         Vector2D direc = new Vector2D(flock.flowfield.tiles.get(casillaBoid).direccion);
+        /*Prueba*/
+        direc.setUnitVector();
+        direc.multiply_by(Boid.MAX_VEL);
+        direc.substract(boid.vel);
+        /*Fin prueba*/
         boid.setDirec(direc);
       }
     }
@@ -319,7 +327,7 @@ class Interaccion implements interacciones {
           if (dist > Boid.size) {
             sepAux.divide_by(dist-Boid.size);
           } else {
-            sepAux.multiply_by(10000);
+            sepAux.multiply_by(100);
           }
           sepAcc.add(sepAux);
         }
@@ -334,7 +342,7 @@ class Interaccion implements interacciones {
           cohAcc.multiply_by(COHESION_GAIN);
 
           // Separation
-          sepAcc.setUnitVector();
+          sepAcc.divide_by(neighbourCount);
           sepAcc.multiply_by(SEPARATION_GAIN);
 
           // Alignment

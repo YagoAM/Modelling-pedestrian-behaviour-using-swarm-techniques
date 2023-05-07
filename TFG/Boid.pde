@@ -36,13 +36,13 @@ class Boid implements boids {
   static final float size = 13;
   static final float MAX_VEL = 2;
   static final float MAX_ACC = 0.3;
-  static final float VISION_RADIO = 60;
-  static final float DIRECTION_GAIN = 0.5;
-  //static final float SEPARATION_GAIN = 5;
-  //static final float ALIGNMENT_GAIN = 0.1;
-  //static final float COHESION_GAIN = 1;
-  static final float FLOCKING_GAIN = 0.3;
-  static final float WALL_SEPARATION_GAIN = 10;
+  static final float VISION_RADIO = 90;
+  static final float DIRECTION_GAIN = 1;
+  static final float FLOCKING_GAIN = 1;
+  static final float WALL_SEPARATION_GAIN = 1;
+  float percentDirection = 0.6;
+  float percentFlocking = 0.4;
+  float percetnWallSeparation = 0;
 
   /*Constructor*/
   Boid(Vector2D posIn, Vector2D velIn, color colorIn) {
@@ -106,17 +106,18 @@ class Boid implements boids {
   void calcAcc() {
     acc.setCero();
 
+    percentDirection = 0.6;
+    percentFlocking = 0.4;
+    percetnWallSeparation = 0;
+    if (separacionMuro == null || (separacionMuro.x!=0 && separacionMuro.y!=0)) {
+      percentDirection = 0.15;
+      percentFlocking = 0.25;
+      percetnWallSeparation = 0.6;
+    }
 
-    //acc.add(separacion);
-    //acc.add(alineamiento);
-    //acc.add(cohesion);
-    acc.add(flocking);
-    acc.add(separacionMuro);
-
-    //acc.limit(MAX_ACC);
-
-    acc.add(direccion);
-    acc.limit(MAX_ACC);
+    acc.addScaled(flocking, percentFlocking, MAX_ACC);
+    acc.addScaled(direccion, percentDirection, MAX_ACC);
+    acc.addScaled(separacionMuro, percetnWallSeparation, MAX_ACC);
   }
 
   /*Funciones basicas*/

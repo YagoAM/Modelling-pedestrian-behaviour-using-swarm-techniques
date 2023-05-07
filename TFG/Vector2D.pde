@@ -11,6 +11,7 @@ interface vector { //<>// //<>// //<>// //<>// //<>//
 
   /*Funciones básicas*/
   void add(Vector2D in);
+  void addScaled(Vector2D in, float porcentaje, float base);
   void substract(Vector2D in);
   void multiply_by(float gain);
   void divide_by(float div);
@@ -170,6 +171,12 @@ class Vector2D implements vector {
     x+=in.x;
     y+=in.y;
   }
+  void addScaled(Vector2D in, float porcentaje, float base) {
+    Vector2D v = in.getUnitVector();
+    v.multiply_by(porcentaje*base);
+    x += v.x;
+    y += v.y;
+  }
   void substract(Vector2D in) {
     x-=in.x;
     y-=in.y;
@@ -207,7 +214,7 @@ class Vector2D implements vector {
     unit.y = y/mod;
     return unit;
   }
-  
+
   void setUnitVector() {
     Vector2D v = this.getUnitVector();
     this.set(v);
