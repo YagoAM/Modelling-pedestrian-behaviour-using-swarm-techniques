@@ -44,5 +44,6 @@ class FlockList implements flocklists {
       interactor.flow(flock, grid);
     }
     interactor.flocking(this);
+    interactor.boidSeparation(this);
   }
 }

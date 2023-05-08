@@ -7,9 +7,10 @@ class Interaccion implements interacciones {
   static final float FEELER_ANGLE_FACTOR = 2.5;
   static final boolean SHOW_FEELERS = false;
 
-  static final float COHESION_GAIN = 0.2;
-  static final float SEPARATION_GAIN = 9.5;
+  static final float COHESION_GAIN = 0.01;
+  static final float SEPARATION_GAIN = 25;
   static final float ALIGNMENT_GAIN = 0.5;
+  static final float BOID_SEPARATION_GAIN = 5;
 
   void colision(Boid boid, Grid grid) {
     Casilla casillaBoid = new Casilla((int)(boid.pos.x/grid.lado), (int)(boid.pos.y/grid.lado));
@@ -325,7 +326,7 @@ class Interaccion implements interacciones {
           //Separation
           sepAux.set(substract(boid.pos, other.pos).getUnitVector());
           if (dist > Boid.size) {
-            sepAux.divide_by(dist-Boid.size);
+            sepAux.divide_by(dist);
           } else {
             sepAux.multiply_by(100);
           }
@@ -335,10 +336,10 @@ class Interaccion implements interacciones {
           // Cohesion
           cohAcc.divide_by(neighbourCount);
           cohAcc.substract(boid.pos);
-          cohAcc.setUnitVector();
-          cohAcc.multiply_by(Boid.MAX_VEL);
-          cohAcc.substract(boid.vel);
-          cohAcc.setUnitVector();
+          //cohAcc.setUnitVector();
+          //cohAcc.multiply_by(Boid.MAX_VEL);
+          //cohAcc.substract(boid.vel);
+          //cohAcc.setUnitVector();
           cohAcc.multiply_by(COHESION_GAIN);
 
           // Separation
@@ -361,6 +362,51 @@ class Interaccion implements interacciones {
     }
   }
 
+  void boidSeparation (FlockList lista) {
+    Vector2D sepAcc = new Vector2D();
+
+    //Vectores auxiliares
+    Vector2D sepAux = new Vector2D();
+
+    //Variables auxiliares
+    float dist;
+    float neighbourCount;
+
+    ArrayList<Flock> flocks = lista.lista;
+
+    if (flocks == null || flocks.isEmpty()) {
+      return;
+    }
+
+    for (Flock flock : flocks) {
+      for (Boid boid : flock.boids) {
+        sepAcc.setCero();
+        sepAux.setCero();
+        neighbourCount = 0;
+
+        ArrayList<Boid> nonFlockNeighbours = getNonFlockNeighbours(boid, flock, lista);
+        for (Boid other : nonFlockNeighbours) {
+          dist = boid.dist2(other);
+          neighbourCount++;
+          //Separation
+          sepAux.set(substract(boid.pos, other.pos).getUnitVector());
+          if (dist > Boid.size) {
+            sepAux.divide_by(dist);
+          } else {
+            sepAux.multiply_by(100);
+          }
+          sepAcc.add(sepAux);
+        }
+        if (neighbourCount > 0) {
+          //Separation
+          sepAcc.divide_by(neighbourCount);
+          sepAcc.multiply_by(BOID_SEPARATION_GAIN);
+        }
+        boid.setBoidSepar(sepAcc);
+      }
+    }
+  }
+
   ArrayList<Boid> getFlockNeighbours(Boid boid, Flock flock) {
     ArrayList<Boid> neighbours = new ArrayList<Boid>();
 
@@ -377,18 +423,19 @@ class Interaccion implements interacciones {
   }
 
   ArrayList<Boid> getNonFlockNeighbours(Boid boid, Flock flock, FlockList flockList) {
-    ArrayList<Boid> neighbours = new ArrayList<Boid>();
-
-    for (Flock otherFlock : flockList.lista) {
-      if (otherFlock.boids.contains(boid)) {
-        continue;
-      }
-      for (Boid other : flock.boids) {
-        if (other == boid) {
-          continue;
-        }
-        if (boid.dist2(other) <= Boid.VISION_RADIO) {
-          neighbours.add(other);
+    ArrayList<Boid> neighbours = new ArrayList<Boid>(); //<>//
+    float dist; //<>//
+    for (Flock otherFlock : flockList.lista) { //<>//
+      if (otherFlock.boids.contains(boid)) { //<>//
+        continue; //<>//
+      } //<>//
+      for (Boid other : otherFlock.boids) { //<>//
+        if (other == boid) { //<>//
+          continue; //<>//
+        } //<>//
+        dist = boid.dist2(other); //<>//
+        if (dist <= Boid.OTHER_FLOCK_VISION_RADIO) { //<>//
+          neighbours.add(other); //<>//
         }
       }
     }

@@ -8,6 +8,7 @@ interface boids { //<>//
   //void setCohes(Vector2D in);
   void setFlocking(Vector2D in);
   void setSeparMuro(Vector2D in);
+  void setBoidSepar(Vector2D in);
 
   /*Funcion de calculo de la aceleracion final*/
   void calcAcc();
@@ -28,21 +29,25 @@ class Boid implements boids {
   //Vector2D separacion;  //Aceleración de la componente de separación.
   //Vector2D alineamiento;  //Aceleración de la componente de alineamiento.
   //Vector2D cohesion;  //Aceleración de la componente de cohesion.
-  Vector2D flocking;
+  Vector2D flocking;  //Aceleración de la componente del flocking.
   Vector2D separacionMuro;  //Aceleración de la componente de separación del muro.
+  Vector2D separacionBoid;
   color fillColor;  //Color para la representacion del Boid, variará dependiendo de a que Flock pertenezca, para poder diferenciarlos.
 
   /*Atributos Static*/
   static final float size = 13;
-  static final float MAX_VEL = 2;
+  static final float MAX_VEL = 1.7;
   static final float MAX_ACC = 0.3;
   static final float VISION_RADIO = 90;
+  static final float OTHER_FLOCK_VISION_RADIO = 50;
   static final float DIRECTION_GAIN = 1;
   static final float FLOCKING_GAIN = 1;
   static final float WALL_SEPARATION_GAIN = 1;
-  float percentDirection = 0.6;
-  float percentFlocking = 0.4;
-  float percetnWallSeparation = 0;
+  static final float BOID_SEPARATION_GAIN = 1;
+  float percentDirection = 0.175;
+  float percentFlocking = 0.125;
+  float percetnWallSeparation = 0.5;
+  float percetnBoidSeparation = 0.2;
 
   /*Constructor*/
   Boid(Vector2D posIn, Vector2D velIn, color colorIn) {
@@ -57,6 +62,7 @@ class Boid implements boids {
     //cohesion = new Vector2D();
     flocking = new Vector2D();
     separacionMuro = new Vector2D();
+    separacionBoid = new Vector2D();
 
     fillColor = colorIn;
   }
@@ -101,23 +107,29 @@ class Boid implements boids {
     aux.multiply_by(WALL_SEPARATION_GAIN);
     separacionMuro = aux;
   }
+  void setBoidSepar(Vector2D in){
+    Vector2D aux = new Vector2D(in);
+    aux.multiply_by(BOID_SEPARATION_GAIN);
+    separacionBoid = aux;
+  }
 
   /*Funcion de calculo de la aceleracion final*/
   void calcAcc() {
     acc.setCero();
 
-    percentDirection = 0.6;
-    percentFlocking = 0.4;
-    percetnWallSeparation = 0;
-    if (separacionMuro == null || (separacionMuro.x!=0 && separacionMuro.y!=0)) {
-      percentDirection = 0.15;
-      percentFlocking = 0.25;
-      percetnWallSeparation = 0.6;
-    }
+    //percentDirection = 0.6;
+    //percentFlocking = 0.4;
+    //percetnWallSeparation = 0;
+    //if (separacionMuro == null || (separacionMuro.x!=0 && separacionMuro.y!=0)) {
+    //  percentDirection = 0.15;
+    //  percentFlocking = 0.25;
+    //  percetnWallSeparation = 0.6;
+    //}
 
     acc.addScaled(flocking, percentFlocking, MAX_ACC);
     acc.addScaled(direccion, percentDirection, MAX_ACC);
     acc.addScaled(separacionMuro, percetnWallSeparation, MAX_ACC);
+    acc.addScaled(separacionBoid, percetnBoidSeparation, MAX_ACC);
   }
 
   /*Funciones basicas*/
