@@ -108,6 +108,12 @@ float dotProduct(Vector2D vect1, Vector2D vect2) {
   return result;
 }
 
+Vector2D product(Vector2D vectorIn, float floatIn) {
+  Vector2D result = new Vector2D(vectorIn);
+  result.multiply_by(floatIn);
+  return result;
+}
+
 Vector2D substract (Vector2D vect1, Vector2D vect2) {
   Vector2D sum = new Vector2D(vect1);
   sum.substract(vect2);

@@ -22,6 +22,7 @@ interface boids { //<>//
 class Boid implements boids {
   /*Atributos*/
   Vector2D pos;
+  Vector2D futurePos;
   Vector2D prevPos;
   Vector2D vel;
   Vector2D acc;
@@ -37,21 +38,23 @@ class Boid implements boids {
   /*Atributos Static*/
   static final float size = 13;
   static final float MAX_VEL = 1.7;
-  static final float MAX_ACC = 0.3;
+  static final float MAX_ACC = 0.17;
+  static final float FUTURE_FRAMES_PROJECTION = 10;
   static final float VISION_RADIO = 90;
   static final float OTHER_FLOCK_VISION_RADIO = 50;
-  static final float DIRECTION_GAIN = 1;
-  static final float FLOCKING_GAIN = 1;
-  static final float WALL_SEPARATION_GAIN = 1;
+  static final float DIRECTION_GAIN = 0.08;
+  static final float FLOCKING_GAIN = 0.7;
+  static final float WALL_SEPARATION_GAIN = 0.7;
   static final float BOID_SEPARATION_GAIN = 1;
-  float percentDirection = 0.175;
-  float percentFlocking = 0.125;
-  float percetnWallSeparation = 0.5;
-  float percetnBoidSeparation = 0.2;
+  //float percentDirection = 0.175;
+  //float percentFlocking = 0.125;
+  //float percetnWallSeparation = 0.5;
+  //float percetnBoidSeparation = 0.2;
 
   /*Constructor*/
   Boid(Vector2D posIn, Vector2D velIn, color colorIn) {
     pos = new Vector2D(posIn);
+    futurePos = new Vector2D(posIn);
     prevPos = new Vector2D(posIn);
     vel = new Vector2D(velIn);
     acc = new Vector2D();
@@ -116,7 +119,7 @@ class Boid implements boids {
   /*Funcion de calculo de la aceleracion final*/
   void calcAcc() {
     acc.setCero();
-
+        //Metodo de suma de aceleraciones por porcentaje de la aceleracion máxima
     //percentDirection = 0.6;
     //percentFlocking = 0.4;
     //percetnWallSeparation = 0;
@@ -125,11 +128,23 @@ class Boid implements boids {
     //  percentFlocking = 0.25;
     //  percetnWallSeparation = 0.6;
     //}
-
-    acc.addScaled(flocking, percentFlocking, MAX_ACC);
-    acc.addScaled(direccion, percentDirection, MAX_ACC);
-    acc.addScaled(separacionMuro, percetnWallSeparation, MAX_ACC);
-    acc.addScaled(separacionBoid, percetnBoidSeparation, MAX_ACC);
+    //acc.addScaled(flocking, percentFlocking, MAX_ACC);
+    //acc.addScaled(direccion, percentDirection, MAX_ACC);
+    //acc.addScaled(separacionMuro, percetnWallSeparation, MAX_ACC);
+    //acc.addScaled(separacionBoid, percetnBoidSeparation, MAX_ACC);
+    
+    
+        //Metodo de suma de aceleraciones por suma simple y truncacion por aceleracion maxima
+    acc.add(flocking);
+    acc.add(direccion);
+    acc.add(separacionMuro);
+    acc.add(separacionBoid);
+    
+    if (separacionBoid == null || (separacionBoid.x!=0 && separacionBoid.y!=0)){
+      println("Hola"); //<>//
+    }
+    
+    acc.limit(MAX_ACC);
   }
 
   /*Funciones basicas*/
@@ -139,6 +154,8 @@ class Boid implements boids {
     vel.limit(MAX_VEL);
     prevPos.set(pos);
     pos.add(vel);
+    futurePos.set(pos);
+    futurePos.add(product(vel,FUTURE_FRAMES_PROJECTION));
 
     if (pos.x >= width) {
       pos.x = width;

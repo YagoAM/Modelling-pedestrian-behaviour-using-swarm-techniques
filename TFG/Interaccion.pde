@@ -2,15 +2,15 @@ interface interacciones { //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>/
 }
 
 class Interaccion implements interacciones {
-  static final int PPAL_FEELER_LENGTH = 25;
-  static final int LATERAL_FEELER_LENGTH = 11;
+  static final int PPAL_FEELER_LENGTH = 55;
+  static final int LATERAL_FEELER_LENGTH = 21;
   static final float FEELER_ANGLE_FACTOR = 2.5;
   static final boolean SHOW_FEELERS = false;
 
   static final float COHESION_GAIN = 0.01;
   static final float SEPARATION_GAIN = 25;
-  static final float ALIGNMENT_GAIN = 0.5;
-  static final float BOID_SEPARATION_GAIN = 5;
+  static final float ALIGNMENT_GAIN = 0.3;
+  static final float BOID_SEPARATION_GAIN = 25;
 
   void colision(Boid boid, Grid grid) {
     Casilla casillaBoid = new Casilla((int)(boid.pos.x/grid.lado), (int)(boid.pos.y/grid.lado));
@@ -143,13 +143,13 @@ class Interaccion implements interacciones {
     feelers[0] = new Vector2D(auxFeeler);
     aux.divide_by(FEELER_ANGLE_FACTOR);//define el angulo de separacion, si es 1 son 45º, si es 2 son aprox 25º
     feelers[0].add(aux);
-    feelers[0].getUnitVector();
+    feelers[0].setUnitVector();
     feelers[0].multiply_by(PPAL_FEELER_LENGTH);
     feelers[0].add(boid.pos); //FEELER DERECHA
 
     feelers[1] = new Vector2D(auxFeeler);
     feelers[1].substract(aux);
-    feelers[1].getUnitVector();
+    feelers[1].setUnitVector();
     feelers[1].multiply_by(PPAL_FEELER_LENGTH);
     feelers[1].add(boid.pos); //FEELER IZQUIERDA
 
@@ -157,13 +157,13 @@ class Interaccion implements interacciones {
 
     feelers[2] = new Vector2D();
     feelers[2].add(aux);
-    feelers[2].getUnitVector();
+    feelers[2].setUnitVector();
     feelers[2].multiply_by(LATERAL_FEELER_LENGTH);
     feelers[2].add(boid.pos); //FEELER DERECHA
 
     feelers[3] = new Vector2D();
     feelers[3].substract(aux);
-    feelers[3].getUnitVector();
+    feelers[3].setUnitVector();
     feelers[3].multiply_by(LATERAL_FEELER_LENGTH);
     feelers[3].add(boid.pos); //FEELER IZQUIERDA
     /**/
@@ -423,19 +423,19 @@ class Interaccion implements interacciones {
   }
 
   ArrayList<Boid> getNonFlockNeighbours(Boid boid, Flock flock, FlockList flockList) {
-    ArrayList<Boid> neighbours = new ArrayList<Boid>(); //<>//
-    float dist; //<>//
-    for (Flock otherFlock : flockList.lista) { //<>//
-      if (otherFlock.boids.contains(boid)) { //<>//
-        continue; //<>//
-      } //<>//
-      for (Boid other : otherFlock.boids) { //<>//
-        if (other == boid) { //<>//
-          continue; //<>//
-        } //<>//
-        dist = boid.dist2(other); //<>//
-        if (dist <= Boid.OTHER_FLOCK_VISION_RADIO) { //<>//
-          neighbours.add(other); //<>//
+    ArrayList<Boid> neighbours = new ArrayList<Boid>();
+    float dist;
+    for (Flock otherFlock : flockList.lista) {
+      if (otherFlock.boids.contains(boid)) {
+        continue;
+      }
+      for (Boid other : otherFlock.boids) {
+        if (other == boid) {
+          continue;
+        }
+        dist = boid.dist2(other);
+        if (dist <= Boid.OTHER_FLOCK_VISION_RADIO) {
+          neighbours.add(other);
         }
       }
     }
