@@ -25,7 +25,7 @@ interface vector { //<>// //<>// //<>// //<>// //<>//
   void setUnitVector();
   void setDirection(Vector2D in);  //Cambiar la direccion manteniendo el modulo
   void setMod(float mag);  //Cambiar el modulo manteniendo la direccion
-  void limit(float lim);  //Cambiar el modulo a "lim" si es mayor que éste
+  Vector2D limit(float lim);  //Cambiar el modulo a "lim" si es mayor que éste
 
   /*Depuracion*/
   void print();
@@ -183,6 +183,18 @@ class Vector2D implements vector {
     x += v.x;
     y += v.y;
   }
+  void addLimited(Vector2D in, float maxMod) {
+    float mag = sqrt(pow(this.getX() + in.getX(), 2) + pow(this.getY() + in.getY(), 2));
+    if (mag > maxMod) {
+      float ratio = maxMod / mag;
+      Vector2D limitedVector = new Vector2D(in);
+      limitedVector.multiply_by(ratio);
+      this.add(limitedVector);
+    } else {
+      this.add(in);
+    }
+  }
+  
   void substract(Vector2D in) {
     x-=in.x;
     y-=in.y;
@@ -239,11 +251,12 @@ class Vector2D implements vector {
     this.set(v);
   }
 
-  void limit(float lim) {
+  Vector2D limit(float lim) {
     if (this.getModule() == 0) {
     } else if (this.getModule() > lim) {
       this.setMod(lim);
     }
+    return this;
   }
 
   /*Depuracion*/

@@ -142,7 +142,7 @@ class FlowField implements fields {
   /*Auxiliar para pruebas*/
   void draw() {
     if(target == null){
-      println("cague"); //<>//
+      println("cague");
     }
     grid.get(target).colorinchi = #F50202;
     for (Map.Entry<Casilla, TileData> me : tiles.entrySet()) {

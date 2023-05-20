@@ -5,12 +5,12 @@ class Interaccion implements interacciones {
   static final int PPAL_FEELER_LENGTH = 55;
   static final int LATERAL_FEELER_LENGTH = 21;
   static final float FEELER_ANGLE_FACTOR = 2.5;
-  static final boolean SHOW_FEELERS = false;
+  static final boolean SHOW_FEELERS = true;
 
   static final float COHESION_GAIN = 0.01;
   static final float SEPARATION_GAIN = 25;
-  static final float ALIGNMENT_GAIN = 0.3;
-  static final float BOID_SEPARATION_GAIN = 25;
+  static final float ALIGNMENT_GAIN = 0;
+  static final float BOID_SEPARATION_GAIN = 10;
 
   void colision(Boid boid, Grid grid) {
     Casilla casillaBoid = new Casilla((int)(boid.pos.x/grid.lado), (int)(boid.pos.y/grid.lado));
@@ -63,6 +63,8 @@ class Interaccion implements interacciones {
     int closestWall = -1;
     int trigeredFeeler = -1;
 
+    boolean backwardAcc = false, feelerIzquierda = false, feelerDerecha = false;
+
     Vector2D acc = new Vector2D();
     Vector2D closestPoint = new Vector2D();
     Vector2D auxPoint = new Vector2D();
@@ -93,6 +95,15 @@ class Interaccion implements interacciones {
             break;
           }
           if (auxPoint!=null && (distToThisWall=dist2(boid.pos, auxPoint)) < distToNearestWall) {
+            if (f==0) {
+              feelerDerecha = true;
+            }
+            if (f==1) {
+              feelerIzquierda = true;
+            }
+            if (feelerDerecha == true && feelerIzquierda == true) {
+              backwardAcc = true;
+            }
             distToNearestWall = distToThisWall;
             closestWall = i;
             closestPoint = new Vector2D(auxPoint);
@@ -126,6 +137,10 @@ class Interaccion implements interacciones {
         acc.getUnitVector();
         acc.multiply_by(profundidad.getModule());
         acc.multiply_by(-1);
+        if (backwardAcc == true){
+          acc.set(product(boid.vel.getUnitVector(),-1));
+          acc.multiply_by(profundidad.getModule());
+        }
       }
     }  //FIN LOOP DE FILLERS
 
@@ -389,7 +404,7 @@ class Interaccion implements interacciones {
           dist = boid.dist2(other);
           neighbourCount++;
           //Separation
-          sepAux.set(substract(boid.pos, other.pos).getUnitVector());
+          sepAux.set(substract(boid.futurePos, other.futurePos).getUnitVector());
           if (dist > Boid.size) {
             sepAux.divide_by(dist);
           } else {

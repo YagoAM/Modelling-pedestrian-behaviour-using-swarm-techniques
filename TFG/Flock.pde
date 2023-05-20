@@ -42,7 +42,7 @@ class Flock {
     int i = 0;
     
     if(casilla == null){
-      println("cague"); //<>//
+      println("cague");
     }
     
     while (i < total) {

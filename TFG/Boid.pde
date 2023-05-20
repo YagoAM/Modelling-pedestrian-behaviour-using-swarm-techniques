@@ -141,8 +141,16 @@ class Boid implements boids {
     acc.add(separacionBoid);
     
     if (separacionBoid == null || (separacionBoid.x!=0 && separacionBoid.y!=0)){
-      println("Hola"); //<>//
+      println("Hola");
     }
+    
+        //Metodo suma prioritaria hasta completar MAX_ACC
+    //float modulo_acc;
+    //acc.addLimited(separacionMuro, MAX_ACC);
+    //acc.addLimited(separacionBoid, MAX_ACC);
+    //acc.addLimited(flocking, MAX_ACC);
+    //acc.addLimited(direccion, MAX_ACC); //<>// //<>// //<>// //<>//
+    
     
     acc.limit(MAX_ACC);
   }

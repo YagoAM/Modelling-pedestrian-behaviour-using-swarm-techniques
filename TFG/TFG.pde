@@ -21,7 +21,7 @@ void draw() {
     flocklist.mueve();
     flocklist.interaccion();
     flocklist.dibuja();
-    flocklist.get(0).flowfield.draw();
+    //flocklist.get(0).flowfield.draw();
   }
 }
 

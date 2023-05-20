@@ -20,8 +20,8 @@ class Grid implements grid_interface {
 
   Grid(int in) {  //Es importante aclarar con este constructor que el lado quese use tiene que ser divisor TANTO del Ancho como del Alto
     lado = in;
-    columnas = width / lado;
-    filas = height / lado;
+    columnas = (width / lado);
+    filas = (height / lado);
     matrix = new Tile[columnas][filas];
     muros = new ArrayList <Casilla> ();
 
@@ -59,15 +59,15 @@ class Grid implements grid_interface {
     }
     if(in.x < 0){
       x = 0;
-    } else if(in.x > columnas){
-      x = columnas;
+    } else if(in.x >= columnas){
+      x = columnas-1;
     } else{
       x = in.x;
     }
     if(in.y < 0){
       y = 0;
-    } else if(in.y > filas){
-      y = filas;
+    } else if(in.y >= filas){
+      y = filas-1;
     } else{
       y = in.y;
     }
