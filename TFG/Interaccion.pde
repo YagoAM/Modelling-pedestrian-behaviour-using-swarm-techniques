@@ -137,8 +137,8 @@ class Interaccion implements interacciones {
         acc.getUnitVector();
         acc.multiply_by(profundidad.getModule());
         acc.multiply_by(-1);
-        if (backwardAcc == true){
-          acc.set(product(boid.vel.getUnitVector(),-1));
+        if (backwardAcc == true) {
+          acc.set(product(boid.vel.getUnitVector(), -1));
           acc.multiply_by(profundidad.getModule());
         }
       }
@@ -204,9 +204,17 @@ class Interaccion implements interacciones {
       Casilla casillaBoid = grid.get(casillaAux).casilla;
       if (casillaBoid == flock.flowfield.target) {
         //boid.setDirec(new Vector2D(-boid.vel.x, -boid.vel.y)); //POSIBLE FORMA, QUE SE PARE EL BOID AL LLEGAR
+        grid.get(flock.flowfield.target).colorinchi = #FFFFFF;
         flock.generarPathing();
       } else {
-        Vector2D direc = new Vector2D(flock.flowfield.tiles.get(casillaBoid).direccion);
+        TileData tiledataBoid = flock.flowfield.tiles.get(casillaBoid);
+        Vector2D direc;
+        if (tiledataBoid.LOS==false) {
+          direc = new Vector2D(tiledataBoid.direccion);
+        } else {
+          direc = substract(grid.get(flock.flowfield.target).centro, boid.pos);
+        }
+
         /*Prueba*/
         direc.setUnitVector();
         direc.multiply_by(Boid.MAX_VEL);

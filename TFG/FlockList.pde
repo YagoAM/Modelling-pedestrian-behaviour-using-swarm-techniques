@@ -2,6 +2,9 @@ interface flocklists {
 }
 
 class FlockList implements flocklists {
+  int previousWallNumber;
+  int actualWallNumber;
+  boolean wallChange;
   ArrayList<Flock> lista;
   ArrayList<Boid> listaBoid;
   Grid grid;
@@ -27,9 +30,20 @@ class FlockList implements flocklists {
   }
 
   void mueve() {
+    actualWallNumber = grid.muros.size();
+    if (previousWallNumber != actualWallNumber) {
+      wallChange =  true;
+    }
     for (Flock flock : lista) {
+      if (wallChange == true) {
+        flock.flowfield.recalc();
+      }
       flock.mueve();
     }
+    if (wallChange == true) {
+      wallChange = false;
+    }
+    previousWallNumber = actualWallNumber;
   }
 
   void dibuja() {
