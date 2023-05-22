@@ -35,7 +35,12 @@ void mouseDragged() {
 
 void keyPressed() {
   if (key == 't' || key == 'T') {
-    ff = new FlowField(grid, new Casilla(mouseX/grid.lado, mouseY/grid.lado));
+    if(ff == null){
+      ff = new FlowField(grid, new Casilla(mouseX/grid.lado, mouseY/grid.lado));
+    } else {
+      grid.get(ff.target).colorinchi = #FFFFFF;
+      ff = new FlowField(grid, new Casilla(mouseX/grid.lado, mouseY/grid.lado));
+    }
   }
   if (key == 'a' || key == 'A') {
     flocklist.add(5, new Vector2D(mouseX, mouseY));

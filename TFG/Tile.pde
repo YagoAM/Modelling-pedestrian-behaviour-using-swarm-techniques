@@ -11,7 +11,9 @@ class Tile implements tile_interface {
   Vector2D up_left;  //Vertice arriba izquierda, se utiliza para dibujar el cuadrado
   Vector2D up_right, down_left, down_right;
   Casilla[] vecinos;  //Referencias a las Casillas de los Tiles vecinos
-  int dir[][] = {{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}};  //Direcciones en las que se evaluaran los vecinos
+  //int dir[][] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}}; //4 dirs orden: derecha, abajo, izquierda y arriba
+  int dir[][] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {1, 1}, {-1, 1}, {-1, -1}, {1, -1}}; //8 dirs orden: derecha, abajo, izquierda y arriba
+  //int dir[][] = {{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}};  //Direcciones en las que se evaluaran los vecinos
   int lado;  //Lado del cuadrado
   boolean pathable;  //True puede pasar, False es pared
   color colorinchi;  //Color del cuadrado, blanco = camino, negro = muro, rojo = target, verde = origen (si aplica)

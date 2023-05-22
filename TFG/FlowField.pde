@@ -259,6 +259,7 @@ class FlowField implements fields {
 
           //Recorremos los vecinos del ganador
           for (int i=0; i<vecinos.length; i++) {
+            //if(i>=4){continue;}//Activar para solo tener las cuatro direcciones principales posibles
             Casilla vecino = vecinos[i];
 
             if (vecino!=null && tiles.get(vecino).pathable==false) {

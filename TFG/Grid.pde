@@ -9,6 +9,7 @@ class Grid implements grid_interface {
   /*Atributos*/
   Tile[][] matrix;
   ArrayList <Casilla> muros;
+  //int dir[][] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}}; //4 dirs orden: derecha, abajo, izquierda y arriba
   int dir[][] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {1, 1}, {-1, 1}, {-1, -1}, {1, -1}}; //8 dirs orden: derecha, abajo, izquierda y arriba
   int columnas;  //Columnas == Ancho == X == width
   int filas;  //Filas == Alto == Y == height
