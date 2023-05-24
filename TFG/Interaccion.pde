@@ -1,16 +1,21 @@
-interface interacciones { //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>//
+interface interacciones { //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>//
 }
 
 class Interaccion implements interacciones {
+  //WALL SEPARATION CONSTANTS
   static final int PPAL_FEELER_LENGTH = 55;
   static final int LATERAL_FEELER_LENGTH = 25;
   static final float FEELER_ANGLE_FACTOR = 2.5;
   static final boolean SHOW_FEELERS = false;
 
+  //FLOCKING CONSTANTS
   static final float COHESION_GAIN = 0.01;
   static final float SEPARATION_GAIN = 25;
   static final float ALIGNMENT_GAIN = 0;
+
+  //BOID SEPARATION CONSTANTS
   static final float BOID_SEPARATION_GAIN = 10;
+  static final float MAX_BACKWARD_ACC = 0.5;
 
   void colision(Boid boid, Grid grid) {
     Casilla casillaBoid = new Casilla((int)(boid.pos.x/grid.lado), (int)(boid.pos.y/grid.lado));
@@ -202,8 +207,32 @@ class Interaccion implements interacciones {
     //Metodo de asignar la direccion segun la casilla del void
     /*
     for (Boid boid : flock.boids) {
-      Casilla casillaAux = new Casilla((int)(boid.pos.x/grid.lado), (int)(boid.pos.y/grid.lado));
-      Casilla casillaBoid = grid.get(casillaAux).casilla;
+     Casilla casillaAux = new Casilla((int)(boid.pos.x/grid.lado), (int)(boid.pos.y/grid.lado));
+     Casilla casillaBoid = grid.get(casillaAux).casilla;
+     if (casillaBoid == flock.flowfield.target) {
+     //boid.setDirec(new Vector2D(-boid.vel.x, -boid.vel.y)); //POSIBLE FORMA, QUE SE PARE EL BOID AL LLEGAR
+     grid.get(flock.flowfield.target).colorinchi = #FFFFFF;
+     flock.generarPathing();
+     } else {
+     TileData tiledataBoid = flock.flowfield.tiles.get(casillaBoid);
+     Vector2D direc;
+     if (tiledataBoid.LOS==false) {
+     direc = new Vector2D(tiledataBoid.direccion);
+     } else {
+     direc = substract(grid.get(flock.flowfield.target).centro, boid.pos);
+     }
+     
+     //Prueba
+     direc.setUnitVector();
+     direc.multiply_by(Boid.MAX_VEL);
+     direc.substract(boid.vel);
+     //Fin prueba
+     boid.setDirec(direc);
+     }
+     }/**/
+    //Metodo de asignar la direccion segun la celda cetroFlock
+    for (Boid boid : flock.boids) {
+      Casilla casillaBoid = grid.get(boid.casillaFLock).casilla;
       if (casillaBoid == flock.flowfield.target) {
         //boid.setDirec(new Vector2D(-boid.vel.x, -boid.vel.y)); //POSIBLE FORMA, QUE SE PARE EL BOID AL LLEGAR
         grid.get(flock.flowfield.target).colorinchi = #FFFFFF;
@@ -213,30 +242,6 @@ class Interaccion implements interacciones {
         Vector2D direc;
         if (tiledataBoid.LOS==false) {
           direc = new Vector2D(tiledataBoid.direccion);
-        } else {
-          direc = substract(grid.get(flock.flowfield.target).centro, boid.pos);
-        }
-
-        //Prueba
-        direc.setUnitVector();
-        direc.multiply_by(Boid.MAX_VEL);
-        direc.substract(boid.vel);
-        //Fin prueba
-        boid.setDirec(direc);
-      }
-    }/**/
-    //Metodo de asignar la direccion segun la celda cetroFlock
-    for (Boid boid : flock.boids) {
-      Casilla casillaBoid = grid.get(boid.casillaFLock).casilla; //<>//
-      if (casillaBoid == flock.flowfield.target) {
-        //boid.setDirec(new Vector2D(-boid.vel.x, -boid.vel.y)); //POSIBLE FORMA, QUE SE PARE EL BOID AL LLEGAR
-        grid.get(flock.flowfield.target).colorinchi = #FFFFFF;
-        flock.generarPathing();
-      } else {
-        TileData tiledataBoid = flock.flowfield.tiles.get(casillaBoid); //<>//
-        Vector2D direc;
-        if (tiledataBoid.LOS==false) {
-          direc = new Vector2D(tiledataBoid.direccion); //<>//
         } else {
           direc = substract(grid.get(flock.flowfield.target).centro, boid.pos);
         }
@@ -386,7 +391,7 @@ class Interaccion implements interacciones {
         //Centro del flock
         centroFlock.add(cohAcc);
         centroFlock.add(boid.pos);
-        
+
         if (neighbourCount > 0) {
           //Centro del flock
           centroFlock.divide_by(neighbourCount+1);
@@ -414,11 +419,11 @@ class Interaccion implements interacciones {
           flockAcc.add(sepAcc);
           flockAcc.add(alnAcc);
         }
-        
+
         //set casilla centro del flock
         boid.casillaFLock = grid.get(centroFlock).casilla;
-        
-        //Set flocking acc //<>//
+
+        //Set flocking acc
         boid.setFlocking(flockAcc);
       }
     }
@@ -429,6 +434,8 @@ class Interaccion implements interacciones {
 
     //Vectores auxiliares
     Vector2D sepAux = new Vector2D();
+    Vector2D foreheadAcc = new Vector2D();
+    Vector2D lateralAcc = new Vector2D();
 
     //Variables auxiliares
     float dist;
@@ -464,7 +471,21 @@ class Interaccion implements interacciones {
           sepAcc.divide_by(neighbourCount);
           sepAcc.multiply_by(BOID_SEPARATION_GAIN);
         }
-        boid.setBoidSepar(sepAcc);
+
+        foreheadAcc = calcProjection(sepAcc, boid.heading);
+        lateralAcc = calcProjection(sepAcc, boid.lateral);
+        if (lateralAcc.getModule() != 0) {
+          println("Basil"); //<>//
+        }
+        foreheadAcc.limit(MAX_BACKWARD_ACC);
+        lateralAcc.multiply_by(1.3);
+        if (lateralAcc.getModule() != 0) {
+          println("Basil"); //<>//
+        }
+        sepAcc.set(foreheadAcc);
+        sepAcc.add(lateralAcc);
+
+        boid.setBoidSepar(sepAcc); //<>//
       }
     }
   }
@@ -495,7 +516,7 @@ class Interaccion implements interacciones {
         if (other == boid) {
           continue;
         }
-        dist = boid.dist2(other);
+        dist = boid.dist2future(other);
         if (dist <= Boid.OTHER_FLOCK_VISION_RADIO) {
           neighbours.add(other);
         }

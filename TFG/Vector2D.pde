@@ -108,6 +108,13 @@ float dotProduct(Vector2D vect1, Vector2D vect2) {
   return result;
 }
 
+Vector2D calcProjection(Vector2D vect1, Vector2D vect2){
+  float escalar = dotProduct(vect1, vect2);
+  float x = escalar * vect2.x;
+  float y = escalar * vect2.y;
+  return new Vector2D(x,y);
+}
+
 Vector2D product(Vector2D vectorIn, float floatIn) {
   Vector2D result = new Vector2D(vectorIn);
   result.multiply_by(floatIn);
@@ -255,6 +262,14 @@ class Vector2D implements vector {
     if (this.getModule() == 0) {
     } else if (this.getModule() > lim) {
       this.setMod(lim);
+    }
+    return this;
+  }
+  
+  Vector2D minimum(float min){
+    if (this.getModule() == 0) {
+    } else if (this.getModule() < min) {
+      this.setMod(min);
     }
     return this;
   }
