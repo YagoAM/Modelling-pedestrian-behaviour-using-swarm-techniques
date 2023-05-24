@@ -3,9 +3,9 @@ interface interacciones { //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>/
 
 class Interaccion implements interacciones {
   static final int PPAL_FEELER_LENGTH = 55;
-  static final int LATERAL_FEELER_LENGTH = 21;
+  static final int LATERAL_FEELER_LENGTH = 25;
   static final float FEELER_ANGLE_FACTOR = 2.5;
-  static final boolean SHOW_FEELERS = true;
+  static final boolean SHOW_FEELERS = false;
 
   static final float COHESION_GAIN = 0.01;
   static final float SEPARATION_GAIN = 25;
@@ -169,14 +169,14 @@ class Interaccion implements interacciones {
     feelers[1].add(boid.pos); //FEELER IZQUIERDA
 
     aux=get_perpendicular(auxFeeler);
-
-    feelers[2] = new Vector2D();
+    aux.multiply_by(1.5);
+    feelers[2] = new Vector2D(auxFeeler);
     feelers[2].add(aux);
     feelers[2].setUnitVector();
     feelers[2].multiply_by(LATERAL_FEELER_LENGTH);
     feelers[2].add(boid.pos); //FEELER DERECHA
 
-    feelers[3] = new Vector2D();
+    feelers[3] = new Vector2D(auxFeeler);
     feelers[3].substract(aux);
     feelers[3].setUnitVector();
     feelers[3].multiply_by(LATERAL_FEELER_LENGTH);
@@ -199,6 +199,8 @@ class Interaccion implements interacciones {
   }
 
   void flow(Flock flock, Grid grid) {
+    //Metodo de asignar la direccion segun la casilla del void
+    /*
     for (Boid boid : flock.boids) {
       Casilla casillaAux = new Casilla((int)(boid.pos.x/grid.lado), (int)(boid.pos.y/grid.lado));
       Casilla casillaBoid = grid.get(casillaAux).casilla;
@@ -215,14 +217,38 @@ class Interaccion implements interacciones {
           direc = substract(grid.get(flock.flowfield.target).centro, boid.pos);
         }
 
-        /*Prueba*/
+        //Prueba
         direc.setUnitVector();
         direc.multiply_by(Boid.MAX_VEL);
         direc.substract(boid.vel);
-        /*Fin prueba*/
+        //Fin prueba
         boid.setDirec(direc);
       }
-    }
+    }/**/
+    //Metodo de asignar la direccion segun la celda cetroFlock
+    for (Boid boid : flock.boids) {
+      Casilla casillaBoid = grid.get(boid.casillaFLock).casilla; //<>//
+      if (casillaBoid == flock.flowfield.target) {
+        //boid.setDirec(new Vector2D(-boid.vel.x, -boid.vel.y)); //POSIBLE FORMA, QUE SE PARE EL BOID AL LLEGAR
+        grid.get(flock.flowfield.target).colorinchi = #FFFFFF;
+        flock.generarPathing();
+      } else {
+        TileData tiledataBoid = flock.flowfield.tiles.get(casillaBoid); //<>//
+        Vector2D direc;
+        if (tiledataBoid.LOS==false) {
+          direc = new Vector2D(tiledataBoid.direccion); //<>//
+        } else {
+          direc = substract(grid.get(flock.flowfield.target).centro, boid.pos);
+        }
+
+        //Prueba
+        direc.setUnitVector();
+        direc.multiply_by(Boid.MAX_VEL);
+        direc.substract(boid.vel);
+        //Fin prueba
+        boid.setDirec(direc);
+      }
+    }/**/
   }
 
   //void alig_acc(Boid boid, ArrayList <Boid> near_flock_boids) { //LA FORMULA ORIGINAL DE RAYNOLS ES EL SUMATORIO DE LAS VELOCIDADES DEL RESTO/NUMERO DE BOIDS CERCANOS - NUESTRA VELOCIDAD, PERO SE PUDEN CONSEGUIR RESULTADOS SIMILARES
@@ -313,6 +339,7 @@ class Interaccion implements interacciones {
     Vector2D sepAcc = new Vector2D();
     Vector2D cohAcc = new Vector2D();
     Vector2D alnAcc = new Vector2D();
+    Vector2D centroFlock = new Vector2D();
 
     //Vectores auxiliares
     Vector2D avgHeading = new Vector2D();
@@ -336,6 +363,7 @@ class Interaccion implements interacciones {
         alnAcc.setCero();
         avgHeading.setCero();
         sepAux.setCero();
+        centroFlock.setCero();
         neighbourCount = 0;
 
         ArrayList<Boid> flockNeighbours = getFlockNeighbours(boid, flock);
@@ -355,7 +383,13 @@ class Interaccion implements interacciones {
           }
           sepAcc.add(sepAux);
         }
+        //Centro del flock
+        centroFlock.add(cohAcc);
+        centroFlock.add(boid.pos);
+        
         if (neighbourCount > 0) {
+          //Centro del flock
+          centroFlock.divide_by(neighbourCount+1);
           // Cohesion
           cohAcc.divide_by(neighbourCount);
           cohAcc.substract(boid.pos);
@@ -380,6 +414,11 @@ class Interaccion implements interacciones {
           flockAcc.add(sepAcc);
           flockAcc.add(alnAcc);
         }
+        
+        //set casilla centro del flock
+        boid.casillaFLock = grid.get(centroFlock).casilla;
+        
+        //Set flocking acc //<>//
         boid.setFlocking(flockAcc);
       }
     }
@@ -414,7 +453,7 @@ class Interaccion implements interacciones {
           //Separation
           sepAux.set(substract(boid.futurePos, other.futurePos).getUnitVector());
           if (dist > Boid.size) {
-            sepAux.divide_by(dist);
+            sepAux.divide_by(dist/13);
           } else {
             sepAux.multiply_by(100);
           }

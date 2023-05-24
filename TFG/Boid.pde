@@ -34,18 +34,19 @@ class Boid implements boids {
   Vector2D separacionMuro;  //Aceleración de la componente de separación del muro.
   Vector2D separacionBoid;
   color fillColor;  //Color para la representacion del Boid, variará dependiendo de a que Flock pertenezca, para poder diferenciarlos.
+  Casilla casillaFLock;
 
   /*Atributos Static*/
   static final float size = 13;
   static final float MAX_VEL = 1.7;
   static final float MAX_ACC = 0.17;
-  static final float FUTURE_FRAMES_PROJECTION = 10;
+  static final float FUTURE_FRAMES_PROJECTION = 0;
   static final float VISION_RADIO = 90;
-  static final float OTHER_FLOCK_VISION_RADIO = 50;
-  static final float DIRECTION_GAIN = 0.08;
+  static final float OTHER_FLOCK_VISION_RADIO = 150;
+  static final float DIRECTION_GAIN = 0.07;
   static final float FLOCKING_GAIN = 0.7;
-  static final float WALL_SEPARATION_GAIN = 0.7;
-  static final float BOID_SEPARATION_GAIN = 1;
+  static final float WALL_SEPARATION_GAIN = 1;
+  static final float BOID_SEPARATION_GAIN = 0.07;
   //float percentDirection = 0.175;
   //float percentFlocking = 0.125;
   //float percetnWallSeparation = 0.5;
@@ -66,6 +67,7 @@ class Boid implements boids {
     flocking = new Vector2D();
     separacionMuro = new Vector2D();
     separacionBoid = new Vector2D();
+    casillaFLock = new Casilla();
 
     fillColor = colorIn;
   }

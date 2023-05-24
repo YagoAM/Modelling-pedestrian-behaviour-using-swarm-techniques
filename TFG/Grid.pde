@@ -51,6 +51,10 @@ class Grid implements grid_interface {
       }
     }
   }
+  
+  Tile get(Vector2D pos){
+    return this.get(new Casilla(int(pos.x/grid.lado), int(pos.y/grid.lado)));
+  }
 
   Tile get(Casilla in) {
     int x, y;
