@@ -1,21 +1,21 @@
-interface interacciones { //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>//
+interface interacciones { //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>//
 }
 
 class Interaccion implements interacciones {
   //WALL SEPARATION CONSTANTS
-  static final int PPAL_FEELER_LENGTH = 55;
-  static final int LATERAL_FEELER_LENGTH = 25;
+  static final int PPAL_FEELER_LENGTH = 40;
+  static final int LATERAL_FEELER_LENGTH = 40;
   static final float FEELER_ANGLE_FACTOR = 2.5;
   static final boolean SHOW_FEELERS = false;
 
   //FLOCKING CONSTANTS
   static final float COHESION_GAIN = 0.01;
   static final float SEPARATION_GAIN = 25;
-  static final float ALIGNMENT_GAIN = 0;
+  static final float ALIGNMENT_GAIN = 0.3;
 
   //BOID SEPARATION CONSTANTS
   static final float BOID_SEPARATION_GAIN = 10;
-  static final float MAX_BACKWARD_ACC = 0.5;
+  static final float MAX_BACKWARD_ACC = 0.3;
 
   void colision(Boid boid, Grid grid) {
     Casilla casillaBoid = new Casilla((int)(boid.pos.x/grid.lado), (int)(boid.pos.y/grid.lado));
@@ -108,11 +108,13 @@ class Interaccion implements interacciones {
             }
             if (feelerDerecha == true && feelerIzquierda == true) {
               backwardAcc = true;
+              println("buen ass");
             }
             distToNearestWall = distToThisWall;
             closestWall = i;
             closestPoint = new Vector2D(auxPoint);
             trigeredFeeler = f;
+            feeler = feelers[trigeredFeeler];
           }
         }  //FIN LOOP LADOS DEL MURO
       }  //FIN LOOP DE MUROS
@@ -120,32 +122,36 @@ class Interaccion implements interacciones {
       if (closestWall>=0) {
         Vector2D profundidad = new Vector2D(feeler);
         profundidad.substract(closestPoint);
-
-        switch(trigeredFeeler) {
-        case 0:  //FEELER DERECHA
-          acc = get_perpendicular(boid.vel.getUnitVector());
-          acc.multiply_by(1);
-          break;
-        case 1:  //FEELER IZQUIERDA
-          acc = get_perpendicular(boid.vel.getUnitVector());
+        //MODO DERECHA O IZQUIERDA
+        if (backwardAcc == true) {
+          acc = new Vector2D(boid.vel.getUnitVector());
           acc.multiply_by(-1);
-          break;
-        case 2:  //FEELER DERECHA
-          acc = get_perpendicular(boid.vel.getUnitVector());
-          acc.multiply_by(1);
-          break;
-        case 3:  //FEELER IZQUIERDA
-          acc = get_perpendicular(boid.vel.getUnitVector());
-          acc.multiply_by(-1);
-          break;
+        } else {
+          switch(trigeredFeeler) {
+          case 0:  //FEELER DERECHA
+            acc = get_perpendicular(boid.vel.getUnitVector());
+            acc.multiply_by(-1);
+            break;
+          case 1:  //FEELER IZQUIERDA
+            acc = get_perpendicular(boid.vel.getUnitVector());
+            acc.multiply_by(1);
+            break;
+          case 2:  //FEELER DERECHA
+            acc = get_perpendicular(boid.vel.getUnitVector());
+            acc.multiply_by(-1);
+            break;
+          case 3:  //FEELER IZQUIERDA
+            acc = get_perpendicular(boid.vel.getUnitVector());
+            acc.multiply_by(1);
+            break;
+          }
         }
+
+        //acc = get_perpendicular(feeler);
+        //if(trigeredFeeler == 1 || trigeredFeeler == 3){acc.multiply_by(-1);}
+
         acc.getUnitVector();
         acc.multiply_by(profundidad.getModule());
-        acc.multiply_by(-1);
-        if (backwardAcc == true) {
-          acc.set(product(boid.vel.getUnitVector(), -1));
-          acc.multiply_by(profundidad.getModule());
-        }
       }
     }  //FIN LOOP DE FILLERS
 
@@ -248,8 +254,8 @@ class Interaccion implements interacciones {
 
         //Prueba
         direc.setUnitVector();
-        direc.multiply_by(Boid.MAX_VEL);
-        direc.substract(boid.vel);
+        //direc.multiply_by(Boid.MAX_VEL);
+        //direc.substract(boid.vel);
         //Fin prueba
         boid.setDirec(direc);
       }
@@ -383,8 +389,9 @@ class Interaccion implements interacciones {
           sepAux.set(substract(boid.pos, other.pos).getUnitVector());
           if (dist > Boid.size) {
             sepAux.divide_by(dist);
+            //sepAux.divide_by((dist-Boid.size)/5);
           } else {
-            sepAux.multiply_by(100);
+            sepAux.multiply_by(1000);
           }
           sepAcc.add(sepAux);
         }
@@ -455,37 +462,38 @@ class Interaccion implements interacciones {
 
         ArrayList<Boid> nonFlockNeighbours = getNonFlockNeighbours(boid, flock, lista);
         for (Boid other : nonFlockNeighbours) {
-          dist = boid.dist2(other);
+          dist = boid.dist2future(other);
           neighbourCount++;
           //Separation
           sepAux.set(substract(boid.futurePos, other.futurePos).getUnitVector());
-          if (dist > Boid.size) {
-            sepAux.divide_by(dist/13);
+          if (dist > 0) {
+            sepAux.divide_by((dist)/10);
           } else {
-            sepAux.multiply_by(100);
+            sepAux.multiply_by(1000);
           }
           sepAcc.add(sepAux);
         }
         if (neighbourCount > 0) {
           //Separation
           sepAcc.divide_by(neighbourCount);
-          sepAcc.multiply_by(BOID_SEPARATION_GAIN);
+          //sepAcc.multiply_by(BOID_SEPARATION_GAIN);
         }
-
+        /*
         foreheadAcc = calcProjection(sepAcc, boid.heading);
         lateralAcc = calcProjection(sepAcc, boid.lateral);
         if (lateralAcc.getModule() != 0) {
-          println("Basil"); //<>//
+          println("Basil");
         }
         foreheadAcc.limit(MAX_BACKWARD_ACC);
-        lateralAcc.multiply_by(1.3);
+        lateralAcc.multiply_by(1.5);
         if (lateralAcc.getModule() != 0) {
-          println("Basil"); //<>//
+          println("Basil");
         }
         sepAcc.set(foreheadAcc);
         sepAcc.add(lateralAcc);
-
-        boid.setBoidSepar(sepAcc); //<>//
+        */
+        sepAcc.limit(1);
+        boid.setBoidSepar(sepAcc);
       }
     }
   }

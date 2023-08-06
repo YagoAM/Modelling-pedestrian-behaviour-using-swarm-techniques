@@ -41,13 +41,13 @@ class Boid implements boids {
   static final float size = 13;
   static final float MAX_VEL = 1.7;
   static final float MAX_ACC = 0.17;
-  static final float FUTURE_FRAMES_PROJECTION = 20;
+  static final float FUTURE_FRAMES_PROJECTION = 5;
   static final float VISION_RADIO = 90;
   static final float OTHER_FLOCK_VISION_RADIO = 100;
-  static final float DIRECTION_GAIN = 0.07;
+  static final float DIRECTION_GAIN = 0.1;
   static final float FLOCKING_GAIN = 0.7;
-  static final float WALL_SEPARATION_GAIN = 1;
-  static final float BOID_SEPARATION_GAIN = 0.07;
+  static final float WALL_SEPARATION_GAIN = 0.2;
+  static final float BOID_SEPARATION_GAIN = 1;
   //float percentDirection = 0.175;
   //float percentFlocking = 0.125;
   //float percetnWallSeparation = 0.5;
