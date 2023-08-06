@@ -16,7 +16,7 @@ class Obstacle {
   static final float size = 50;
   static final float MAX_VEL = 1.5;
   static final float MAX_ACC = 0.17;
-  static final float FUTURE_FRAMES_PROJECTION = 20;
+  static final float FUTURE_FRAMES_PROJECTION = 5;
 
   //Constructor
   Obstacle(Vector2D posIn, Vector2D velIn, Grid in) {

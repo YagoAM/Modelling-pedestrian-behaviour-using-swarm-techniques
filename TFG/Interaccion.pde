@@ -3,18 +3,18 @@ interface interacciones { //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>/
 
 class Interaccion implements interacciones {
   //WALL SEPARATION CONSTANTS
-  static final int PPAL_FEELER_LENGTH = 35;
-  static final int LATERAL_FEELER_LENGTH = 35;
+  static final int PPAL_FEELER_LENGTH = 40;
+  static final int LATERAL_FEELER_LENGTH = 40;
   static final float FEELER_ANGLE_FACTOR = 2.5;
   static final boolean SHOW_FEELERS = false;
 
   //FLOCKING CONSTANTS
-  static final float COHESION_GAIN = 0.005;
-  static final float SEPARATION_GAIN = 2.3;
-  static final float ALIGNMENT_GAIN = 0.1;
+  static final float COHESION_GAIN = 0.015;
+  static final float SEPARATION_GAIN = 30;//3;//
+  static final float ALIGNMENT_GAIN = 0;
 
   //BOID SEPARATION CONSTANTS
-  static final float BOID_SEPARATION_GAIN = 10;
+  static final float BOID_SEPARATION_GAIN = 13;
   static final float MAX_BACKWARD_ACC = 0.3;
 
   void colision(Boid boid, Grid grid) {
@@ -142,11 +142,13 @@ class Interaccion implements interacciones {
             }
             if (feelerDerecha == true && feelerIzquierda == true) {
               backwardAcc = true;
+              println("buen ass");
             }
             distToNearestWall = distToThisWall;
             closestWall = i;
             closestPoint = new Vector2D(auxPoint);
             trigeredFeeler = f;
+            feeler = feelers[trigeredFeeler];
           }
         }  //FIN LOOP LADOS DEL MURO
       }  //FIN LOOP DE MUROS
@@ -154,32 +156,36 @@ class Interaccion implements interacciones {
       if (closestWall>=0) {
         Vector2D profundidad = new Vector2D(feeler);
         profundidad.substract(closestPoint);
-
-        switch(trigeredFeeler) {
-        case 0:  //FEELER DERECHA
-          acc = get_perpendicular(boid.vel.getUnitVector());
-          acc.multiply_by(1);
-          break;
-        case 1:  //FEELER IZQUIERDA
-          acc = get_perpendicular(boid.vel.getUnitVector());
+        //MODO DERECHA O IZQUIERDA
+        if (backwardAcc == true) {
+          acc = new Vector2D(boid.vel.getUnitVector());
           acc.multiply_by(-1);
-          break;
-        case 2:  //FEELER DERECHA
-          acc = get_perpendicular(boid.vel.getUnitVector());
-          acc.multiply_by(1);
-          break;
-        case 3:  //FEELER IZQUIERDA
-          acc = get_perpendicular(boid.vel.getUnitVector());
-          acc.multiply_by(-1);
-          break;
+        } else {
+          switch(trigeredFeeler) {
+          case 0:  //FEELER DERECHA
+            acc = get_perpendicular(boid.vel.getUnitVector());
+            acc.multiply_by(-1);
+            break;
+          case 1:  //FEELER IZQUIERDA
+            acc = get_perpendicular(boid.vel.getUnitVector());
+            acc.multiply_by(1);
+            break;
+          case 2:  //FEELER DERECHA
+            acc = get_perpendicular(boid.vel.getUnitVector());
+            acc.multiply_by(-1);
+            break;
+          case 3:  //FEELER IZQUIERDA
+            acc = get_perpendicular(boid.vel.getUnitVector());
+            acc.multiply_by(1);
+            break;
+          }
         }
+
+        //acc = get_perpendicular(feeler);
+        //if(trigeredFeeler == 1 || trigeredFeeler == 3){acc.multiply_by(-1);}
+
         acc.getUnitVector();
         acc.multiply_by(profundidad.getModule());
-        acc.multiply_by(-1);
-        if (backwardAcc == true) {
-          acc.set(product(boid.vel.getUnitVector(), -1));
-          acc.multiply_by(profundidad.getModule());
-        }
       }
     }  //FIN LOOP DE FILLERS
 
@@ -266,7 +272,9 @@ class Interaccion implements interacciones {
      }/**/
     //Metodo de asignar la direccion segun la celda cetroFlock
     for (Boid boid : flock.boids) {
-      Casilla casillaBoid = grid.get(boid.casillaFLock).casilla;
+      Casilla casillaAux = new Casilla((int)(boid.pos.x/grid.lado), (int)(boid.pos.y/grid.lado));
+      Casilla casillaBoid = grid.get(casillaAux).casilla;
+      //Casilla casillaBoid = grid.get(boid.casillaFLock).casilla;
       if (casillaBoid == flock.flowfield.target) {
         //boid.setDirec(new Vector2D(-boid.vel.x, -boid.vel.y)); //POSIBLE FORMA, QUE SE PARE EL BOID AL LLEGAR
         grid.get(flock.flowfield.target).colorinchi = #FFFFFF;
@@ -415,10 +423,16 @@ class Interaccion implements interacciones {
           avgHeading.add(other.vel.getUnitVector());
           //Separation
           sepAux.set(substract(boid.pos, other.pos).getUnitVector());
-          if (dist > Boid.size*2.5) {
-            sepAux.divide_by((dist-Boid.size*2.5)/1);
+          //if (dist > Boid.size*2.5) {
+          //  sepAux.divide_by((dist-Boid.size*2.5)/4);
+          //} else {
+          //  sepAux.multiply_by(5000);
+          //}
+          if (dist > Boid.size) {
+            sepAux.divide_by(dist);
+            //sepAux.divide_by((dist-Boid.size)/5);
           } else {
-            sepAux.multiply_by(5000);
+            sepAux.multiply_by(1000);
           }
           sepAcc.add(sepAux);
         }
@@ -492,17 +506,22 @@ class Interaccion implements interacciones {
           neighbourCount++;
           //Separation
           sepAux.set(substract(boid.futurePos, other.futurePos).getUnitVector());
-          if (dist > Boid.size*2) {
-            sepAux.divide_by((dist-Boid.size*2)/8);
+          //if (dist > Boid.size*2) {
+          //  sepAux.divide_by((dist-Boid.size*2)/8);
+          //} else {
+          //  sepAux.multiply_by(5000);
+          //}
+          if (dist > 0) {
+            sepAux.divide_by((dist)/15);
           } else {
-            sepAux.multiply_by(5000);
+            sepAux.multiply_by(1000);
           }
           sepAcc.add(sepAux);
         }
         if (neighbourCount > 0) {
           //Separation
           sepAcc.divide_by(neighbourCount);
-          sepAcc.multiply_by(BOID_SEPARATION_GAIN);
+          //sepAcc.multiply_by(BOID_SEPARATION_GAIN);
         }
 
         foreheadAcc = calcProjection(sepAcc, boid.heading);
@@ -510,15 +529,20 @@ class Interaccion implements interacciones {
         if (lateralAcc.getModule() != 0) {
           println("Basil");
         }
-        foreheadAcc.limit(MAX_BACKWARD_ACC);
-        lateralAcc.multiply_by(1.5);
+        foreheadAcc.limit(0.1/*MAX_BACKWARD_ACC*/);
+        lateralAcc.multiply_by(0.9);
         if (lateralAcc.getModule() != 0) {
           println("Basil");
         }
         sepAcc.set(foreheadAcc);
         sepAcc.add(lateralAcc);
 
+        sepAcc.limit(1.5);
         boid.setBoidSepar(sepAcc);
+
+        //if (true) {
+        //  line(boid.pos.x, boid.pos.y, boid.pos.x+boid.lateral.x*20, boid.pos.y+boid.lateral.y*20);
+        //}
       }
     }
   }
