@@ -21,7 +21,6 @@ interface boids { //<>//
 
 class Boid implements boids {
   /*Atributos*/
-  Vector2D heading, lateral;
   Vector2D pos;
   Vector2D futurePos;
   Vector2D prevPos;
@@ -44,8 +43,13 @@ class Boid implements boids {
   static final float MAX_ACC = 0.17;
   static final float FUTURE_FRAMES_PROJECTION = 0;
   static final float VISION_RADIO = 90;
+<<<<<<< HEAD
   static final float OTHER_FLOCK_VISION_RADIO = 100;
   static final float DIRECTION_GAIN = 0.1;
+=======
+  static final float OTHER_FLOCK_VISION_RADIO = 150;
+  static final float DIRECTION_GAIN = 0.07;
+>>>>>>> parent of b82215f (Correcion separacion boids)
   static final float FLOCKING_GAIN = 0.7;
   static final float WALL_SEPARATION_GAIN = 0.1;
   static final float BOID_SEPARATION_GAIN = 0.08;
@@ -62,8 +66,6 @@ class Boid implements boids {
     prevPos = new Vector2D(posIn);
     vel = new Vector2D(velIn);
     acc = new Vector2D();
-    heading = vel.getUnitVector();
-    lateral = get_perpendicular(heading);
 
     direccion = new Vector2D();
     //separacion = new Vector2D();
@@ -178,8 +180,6 @@ class Boid implements boids {
     pos.add(vel);
     futurePos.set(pos);
     futurePos.add(product(vel,FUTURE_FRAMES_PROJECTION));
-    heading = vel.getUnitVector();
-    lateral = get_perpendicular(heading);
 
     if (pos.x >= width) {
       pos.x = width;
@@ -210,13 +210,6 @@ class Boid implements boids {
     Vector2D dist = new Vector2D();
     dist.set(pos);
     dist.substract(other.pos);
-    return(dist.getModule());
-  }
-  
-  float dist2future(Boid other) {
-    Vector2D dist = new Vector2D();
-    dist.set(futurePos);
-    dist.substract(other.futurePos);
     return(dist.getModule());
   }
 
