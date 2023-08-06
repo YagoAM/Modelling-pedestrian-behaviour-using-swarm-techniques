@@ -21,7 +21,11 @@ void draw() {
     flocklist.mueve();
     flocklist.interaccion();
     flocklist.dibuja();
-    flocklist.get(0).flowfield.draw();
+    //flocklist.get(0).flowfield.draw();
+  }
+  if (!flocklist.listaObstaculos.lista.isEmpty()) {
+    flocklist.listaObstaculos.mueve();
+    flocklist.listaObstaculos.dibuja();
   }
 }
 
@@ -44,5 +48,8 @@ void keyPressed() {
   }
   if (key == 'a' || key == 'A') {
     flocklist.add(5, new Vector2D(mouseX, mouseY));
+  }
+  if (key == 'q' || key == 'Q') {
+    flocklist.listaObstaculos.preAdd(new Vector2D(mouseX, mouseY));
   }
 }

@@ -1,21 +1,21 @@
-interface interacciones { //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>//
+interface interacciones { //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>//
 }
 
 class Interaccion implements interacciones {
   //WALL SEPARATION CONSTANTS
-  static final int PPAL_FEELER_LENGTH = 55;
-  static final int LATERAL_FEELER_LENGTH = 25;
+  static final int PPAL_FEELER_LENGTH = 35;
+  static final int LATERAL_FEELER_LENGTH = 35;
   static final float FEELER_ANGLE_FACTOR = 2.5;
   static final boolean SHOW_FEELERS = false;
 
   //FLOCKING CONSTANTS
-  static final float COHESION_GAIN = 0.01;
-  static final float SEPARATION_GAIN = 25;
-  static final float ALIGNMENT_GAIN = 0;
+  static final float COHESION_GAIN = 0.005;
+  static final float SEPARATION_GAIN = 2.3;
+  static final float ALIGNMENT_GAIN = 0.1;
 
   //BOID SEPARATION CONSTANTS
   static final float BOID_SEPARATION_GAIN = 10;
-  static final float MAX_BACKWARD_ACC = 0.5;
+  static final float MAX_BACKWARD_ACC = 0.3;
 
   void colision(Boid boid, Grid grid) {
     Casilla casillaBoid = new Casilla((int)(boid.pos.x/grid.lado), (int)(boid.pos.y/grid.lado));
@@ -23,6 +23,40 @@ class Interaccion implements interacciones {
 
     colision(boid, tileBoid.vecinos);
     wallAvoidance(boid, tileBoid.vecinos);
+  }
+
+  void obstacleAvoidance(Flock flock, ObstacleList lista) {
+    for (Boid boid : flock.boids) {
+      obstacleAvoidance(boid, lista);
+    }
+  }
+
+  void obstacleAvoidance(Boid boid, ObstacleList lista) {
+    if (!lista.lista.isEmpty()) {
+      float dist = Boid.OTHER_FLOCK_VISION_RADIO;
+      int contador = -1;
+      int ganador = 0;
+      Vector2D direccion = new Vector2D();
+
+      for (Obstacle obstacle : lista.lista) {
+        contador++;
+        float auxDist = dist2(boid.futurePos, obstacle.futurePos);
+        if (auxDist < dist) {
+          dist = auxDist;
+          ganador = contador;
+        }
+      }
+      if (dist < Boid.OTHER_FLOCK_VISION_RADIO) {
+        if (dist > Boid.size+Obstacle.size) {
+          Obstacle obstacle = lista.get(ganador);
+          direccion = substract(boid.futurePos, obstacle.futurePos).getUnitVector();
+          direccion.divide_by((dist-(Boid.size+Obstacle.size))/5);
+        } else {
+          direccion.multiply_by(5000);
+        }
+      }
+      boid.setObstacleSepar(direccion);
+    }
   }
 
   void colision(Boid boid, Casilla[] walls) {
@@ -381,20 +415,19 @@ class Interaccion implements interacciones {
           avgHeading.add(other.vel.getUnitVector());
           //Separation
           sepAux.set(substract(boid.pos, other.pos).getUnitVector());
-          if (dist > Boid.size) {
-            sepAux.divide_by(dist);
+          if (dist > Boid.size*2.5) {
+            sepAux.divide_by((dist-Boid.size*2.5)/1);
           } else {
-            sepAux.multiply_by(100);
+            sepAux.multiply_by(5000);
           }
           sepAcc.add(sepAux);
         }
         //Centro del flock
         centroFlock.add(cohAcc);
         centroFlock.add(boid.pos);
-
+        centroFlock.divide_by(neighbourCount+1);
+        //cohAcc.add(boid.pos);
         if (neighbourCount > 0) {
-          //Centro del flock
-          centroFlock.divide_by(neighbourCount+1);
           // Cohesion
           cohAcc.divide_by(neighbourCount);
           cohAcc.substract(boid.pos);
@@ -455,14 +488,14 @@ class Interaccion implements interacciones {
 
         ArrayList<Boid> nonFlockNeighbours = getNonFlockNeighbours(boid, flock, lista);
         for (Boid other : nonFlockNeighbours) {
-          dist = boid.dist2(other);
+          dist = boid.dist2future(other);
           neighbourCount++;
           //Separation
           sepAux.set(substract(boid.futurePos, other.futurePos).getUnitVector());
-          if (dist > Boid.size) {
-            sepAux.divide_by(dist/13);
+          if (dist > Boid.size*2) {
+            sepAux.divide_by((dist-Boid.size*2)/8);
           } else {
-            sepAux.multiply_by(100);
+            sepAux.multiply_by(5000);
           }
           sepAcc.add(sepAux);
         }
@@ -475,17 +508,17 @@ class Interaccion implements interacciones {
         foreheadAcc = calcProjection(sepAcc, boid.heading);
         lateralAcc = calcProjection(sepAcc, boid.lateral);
         if (lateralAcc.getModule() != 0) {
-          println("Basil"); //<>//
+          println("Basil");
         }
         foreheadAcc.limit(MAX_BACKWARD_ACC);
-        lateralAcc.multiply_by(1.3);
+        lateralAcc.multiply_by(1.5);
         if (lateralAcc.getModule() != 0) {
-          println("Basil"); //<>//
+          println("Basil");
         }
         sepAcc.set(foreheadAcc);
         sepAcc.add(lateralAcc);
 
-        boid.setBoidSepar(sepAcc); //<>//
+        boid.setBoidSepar(sepAcc);
       }
     }
   }

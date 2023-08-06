@@ -7,6 +7,7 @@ class FlockList implements flocklists {
   boolean wallChange;
   ArrayList<Flock> lista;
   ArrayList<Boid> listaBoid;
+  ObstacleList listaObstaculos;
   Grid grid;
   Interaccion interactor;	
 
@@ -14,6 +15,7 @@ class FlockList implements flocklists {
   FlockList(Grid in) {
     lista = new ArrayList<Flock>();
     listaBoid = new ArrayList<Boid>();
+    listaObstaculos = new ObstacleList(in);
     grid = in;
     interactor = new Interaccion();
   }
@@ -56,6 +58,7 @@ class FlockList implements flocklists {
     for (Flock flock : lista) {
       interactor.colision(flock, grid);
       interactor.flow(flock, grid);
+      interactor.obstacleAvoidance(flock, listaObstaculos);
     }
     interactor.flocking(this);
     interactor.boidSeparation(this);
