@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 interface interacciones { //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>//
 }
 
@@ -22,6 +23,12 @@ interface interacciones { //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>/
 }
 
 class Interaccion implements interacciones {
+=======
+interface interacciones { //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>//
+}
+
+class Interaccion implements interacciones {
+>>>>>>> parent of b82215f (Correcion separacion boids)
   static final int PPAL_FEELER_LENGTH = 55;
   static final int LATERAL_FEELER_LENGTH = 25;
   static final float FEELER_ANGLE_FACTOR = 2.5;
@@ -31,6 +38,9 @@ class Interaccion implements interacciones {
   static final float SEPARATION_GAIN = 25;
   static final float ALIGNMENT_GAIN = 0;
   static final float BOID_SEPARATION_GAIN = 10;
+<<<<<<< HEAD
+>>>>>>> parent of b82215f (Correcion separacion boids)
+=======
 >>>>>>> parent of b82215f (Correcion separacion boids)
 
   void colision(Boid boid, Grid grid) {
@@ -442,8 +452,12 @@ class Interaccion implements interacciones {
         centroFlock.add(cohAcc);
         centroFlock.add(boid.pos);
 <<<<<<< HEAD
+<<<<<<< HEAD
         centroFlock.divide_by(neighbourCount+1);
         //cohAcc.add(boid.pos);
+=======
+        
+>>>>>>> parent of b82215f (Correcion separacion boids)
 =======
         
 >>>>>>> parent of b82215f (Correcion separacion boids)
@@ -523,6 +537,7 @@ class Interaccion implements interacciones {
           sepAcc.multiply_by(BOID_SEPARATION_GAIN);
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
         foreheadAcc = calcProjection(sepAcc, boid.heading);
         lateralAcc = calcProjection(sepAcc, boid.lateral);
@@ -537,6 +552,8 @@ class Interaccion implements interacciones {
         sepAcc.set(foreheadAcc);
         sepAcc.add(lateralAcc);
 
+=======
+>>>>>>> parent of b82215f (Correcion separacion boids)
 =======
 >>>>>>> parent of b82215f (Correcion separacion boids)
         boid.setBoidSepar(sepAcc);

@@ -44,9 +44,12 @@ class Boid implements boids {
   static final float FUTURE_FRAMES_PROJECTION = 0;
   static final float VISION_RADIO = 90;
 <<<<<<< HEAD
+<<<<<<< HEAD
   static final float OTHER_FLOCK_VISION_RADIO = 100;
   static final float DIRECTION_GAIN = 0.1;
 =======
+=======
+>>>>>>> parent of b82215f (Correcion separacion boids)
   static final float OTHER_FLOCK_VISION_RADIO = 150;
   static final float DIRECTION_GAIN = 0.07;
 >>>>>>> parent of b82215f (Correcion separacion boids)
