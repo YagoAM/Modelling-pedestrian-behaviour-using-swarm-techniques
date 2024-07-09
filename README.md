@@ -4,7 +4,7 @@ Welcome to the repository for the code accompanying the article "Modelling Pedes
 
 This work presents a microscopic model where pedestrian behavior is characterized by a set of forces. Each force represents a different aspect of pedestrian movement, aiming to create a virtual environment for training and testing control systems in collaborative robots or autonomous vehicles. The model utilizes algorithms for flocking, pathfinding, dynamic obstacle avoidance, and wall avoidance to calculate these forces, ensuring a realistic simulation of pedestrian interactions and navigation.
 
-![GraphicalAbstract](https://github.com/YagoAM/Modelling-pedestrian-behaviour-using-swarm-techniques/assets/50001054/ee854cc2-30d7-4b3a-80d3-f03b79c89646)
+![GraphicalAbstract](https://github.com/YagoAM/Modelling-pedestrian-behaviour-using-swarm-techniques/assets/50001054/733c32ed-9836-495e-9f88-8c8878da43ad)
 
 ## Usage
 This implementation of the algorithm has been done in Processing, a development environment and programming language based on Java​​. To execute it, open the Code/main.pde file in the Processing IDE and run it.
