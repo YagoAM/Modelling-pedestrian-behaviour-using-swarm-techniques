@@ -9,7 +9,7 @@ class Interaccion implements interacciones {
   static final boolean SHOW_FEELERS = false;
 
   //FLOCKING CONSTANTS
-  static final float COHESION_GAIN = 0.015;
+  static final float COHESION_GAIN = 0.01;
   static final float SEPARATION_GAIN = 30;//3;//
   static final float ALIGNMENT_GAIN = 0;
 
