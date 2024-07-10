@@ -15,6 +15,12 @@ This implementation of the algorithm has been done in Processing, a development 
 - Left-click: Switch the pathability of the tile
 - a: Spawn a group in the mouse coordinates
 - q: Add a dynamic obstacle that moves between the two points. First "q" press sets the first point, and the second press sets the second points
+- Up Arrow: Increase the flock size for new flocks
+- Down Arrow: Decrease the flock size for new flocks
+
+In the file "Interaccion," you will find the algorithms responsible for the interaction between agents and between agents and the environment. The different parameters governing these interactions are defined there. You can try modifying them to see the effect of each one.
+
+In the file "FlowField," you will find the code related to Pathfinding and the LOS system.
 
 ## Authors 
 - **Yago Ávila Moré** got the title of B. Sc. in Industrial Electronics and Automation Engineering in 2023 from the Universidad Politécnica de Madrid (UPM) (Spain). His interests are mainly focused on systems control, navigation, artificial intelligence and robotics. He is currently working at Perseo Techworks, a company dedicated to the development of autonomous unmanned vehicles.
