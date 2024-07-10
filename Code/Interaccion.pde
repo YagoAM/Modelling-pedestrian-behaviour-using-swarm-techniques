@@ -10,7 +10,7 @@ class Interaccion implements interacciones {
 
   //FLOCKING CONSTANTS
   static final float COHESION_GAIN = 0.01;
-  static final float SEPARATION_GAIN = 30;//3;//
+  static final float SEPARATION_GAIN = 10;//3;//
   static final float ALIGNMENT_GAIN = 0;
 
   //BOID SEPARATION CONSTANTS
@@ -443,7 +443,8 @@ class Interaccion implements interacciones {
         //cohAcc.add(boid.pos);
         if (neighbourCount > 0) {
           // Cohesion
-          cohAcc.divide_by(neighbourCount);
+          cohAcc.add(boid.pos);
+          cohAcc.divide_by(neighbourCount+1);
           cohAcc.substract(boid.pos);
           //cohAcc.setUnitVector();
           //cohAcc.multiply_by(Boid.MAX_VEL);
@@ -452,7 +453,6 @@ class Interaccion implements interacciones {
           cohAcc.multiply_by(COHESION_GAIN);
 
           // Separation
-          sepAcc.divide_by(neighbourCount);
           sepAcc.multiply_by(SEPARATION_GAIN);
 
           // Alignment
@@ -526,14 +526,8 @@ class Interaccion implements interacciones {
 
         foreheadAcc = calcProjection(sepAcc, boid.heading);
         lateralAcc = calcProjection(sepAcc, boid.lateral);
-        if (lateralAcc.getModule() != 0) {
-          println("Basil");
-        }
         foreheadAcc.limit(0.1/*MAX_BACKWARD_ACC*/);
         lateralAcc.multiply_by(0.9);
-        if (lateralAcc.getModule() != 0) {
-          println("Basil");
-        }
         sepAcc.set(foreheadAcc);
         sepAcc.add(lateralAcc);
 

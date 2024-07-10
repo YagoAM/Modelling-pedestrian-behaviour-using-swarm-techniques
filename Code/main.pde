@@ -3,6 +3,8 @@ Input input;
 FlockList flocklist;
 FlowField ff;
 
+int add_number = 5;
+
 void setup() {
   size(1500, 1000);  //ancho, alto
   grid = new Grid(50); //Validos: 10, 20, 25, 50 y 100
@@ -46,10 +48,18 @@ void keyPressed() {
       ff = new FlowField(grid, new Casilla(mouseX/grid.lado, mouseY/grid.lado));
     }
   }
-  if (key == 'a' || key == 'A') {
-    flocklist.add(5, new Vector2D(mouseX, mouseY));
+  else if (key == 'a' || key == 'A') {
+    flocklist.add(add_number, new Vector2D(mouseX, mouseY));
   }
-  if (key == 'q' || key == 'Q') {
+  else if (key == 'q' || key == 'Q') {
     flocklist.listaObstaculos.preAdd(new Vector2D(mouseX, mouseY));
+  }
+  else if (key == CODED){
+    if (keyCode == UP){
+      add_number++;
+    }
+    else if (keyCode == DOWN){
+      add_number--;
+    }
   }
 }
