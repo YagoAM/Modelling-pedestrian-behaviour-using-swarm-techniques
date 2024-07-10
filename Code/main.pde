@@ -60,6 +60,7 @@ void keyPressed() {
     }
     else if (keyCode == DOWN){
       add_number--;
+      add_number = (add_number<=0) ? 1 : add_number;
     }
   }
 }
